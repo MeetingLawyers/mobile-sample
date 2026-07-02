@@ -1,0 +1,51 @@
+{
+  "originHash" : "854b0f49c5384d5f573cac0be0346909b671a86d58dd7417ced034333ec19f49",
+  "pins" : [
+    {
+      "identity" : "capacitor-swift-pm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ionic-team/capacitor-swift-pm.git",
+      "state" : {
+        "revision" : "2231987d85b8b0b289320b1d0947b4ae8345cde4",
+        "version" : "8.4.1"
+      }
+    },
+    {
+      "identity" : "ios-sdk-spm-meetinglawyers",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MeetingLawyers/ios-sdk-spm-meetinglawyers",
+      "state" : {
+        "revision" : "b0b736084a1295da3b71e162eea266d297db1e6f",
+        "version" : "2.1.0"
+      }
+    },
+    {
+      "identity" : "socket.io-client-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/socketio/socket.io-client-swift.git",
+      "state" : {
+        "revision" : "42da871d9369f290d6ec4930636c40672143905b",
+        "version" : "16.1.1"
+      }
+    },
+    {
+      "identity" : "starscream",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/daltoniam/Starscream",
+      "state" : {
+        "revision" : "c6bfd1af48efcc9a9ad203665db12375ba6b145a",
+        "version" : "4.0.8"
+      }
+    },
+    {
+      "identity" : "tuskit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tus/TusKit.git",
+      "state" : {
+        "revision" : "167938293923b5c31ba1255da5aada8e67533984",
+        "version" : "3.7.1"
+      }
+    }
+  ],
+  "version" : 3
+}
