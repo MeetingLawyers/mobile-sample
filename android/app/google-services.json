@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "670147564619",
+    "project_id": "meetinglawyers-demo",
+    "storage_bucket": "meetinglawyers-demo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670147564619:android:60ffa4d946b9c2599529ce",
+        "android_client_info": {
+          "package_name": "com.meetinglawyers.sdk.sample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "670147564619-3nfdidend6asp7svlntg5pl5tte898hq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQDL0pMM1L2qJrtyVCiT8sRZBOfU7euQo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "670147564619-3nfdidend6asp7svlntg5pl5tte898hq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "670147564619-1qqiq7rpuonjgrurp2o13hndsv3sa8ds.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.lisaseguros.lawyers.dev"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

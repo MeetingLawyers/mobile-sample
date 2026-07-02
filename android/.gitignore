@@ -26,8 +26,8 @@ render.experimental.xml
 *.jks
 *.keystore
 
-# Google Services (e.g. APIs or Firebase)
-google-services.json
+# google-services.json committed on purpose: Firebase client config for
+# com.meetinglawyers.sdk.sample only (trimmed; client keys are not secrets).
 
 # Android Profiling
 *.hprof

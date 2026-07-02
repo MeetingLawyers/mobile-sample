@@ -8,7 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.meetinglawyers.sample"
+        applicationId = "com.meetinglawyers.sdk.sample"
         minSdk = 23
         targetSdk = 33
         versionCode = 1
