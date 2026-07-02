@@ -6,11 +6,13 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.meetinglawyers.sdk.CustomerSdkBuildMode;
+import com.meetinglawyers.sdk.MeetingLawyersClient;
 import com.meetinglawyers.sdk.MeetingLawyersSDK;
 import com.meetinglawyers.sdk.SDKCallbackWithoutData;
 import com.meetinglawyers.sdk.domain.logger.LogMode;
 
 import java.util.Locale;
+import java.util.function.Consumer;
 
 /**
  * Capacitor bridge to the MeetingLawyers Android SDK.
@@ -40,6 +42,57 @@ public class MeetingLawyersPlugin extends Plugin {
                 call.reject("Configure failed: " + e.getMessage());
             }
         });
+    }
+
+    /** Applies the theme colors supported on Android; unsupported keys are ignored. */
+    @PluginMethod
+    public void configureTheme(PluginCall call) {
+        if (notConfigured(call)) {
+            return;
+        }
+        MeetingLawyersClient client = MeetingLawyersSDK.Companion.getClientInstance();
+        applyColor(call, "primaryColor", client::setPrimaryColor);
+        applyColor(call, "secondaryColor", client::setSecondaryColor);
+        applyColor(call, "navigationBarColor", client::setNavigationBarColor);
+        applyColor(call, "incomingMessageColor", client::setIncomingMessageBgColor);
+        applyColor(call, "outgoingMessageColor", client::setOngoingMessageBgColor);
+        applyColor(call, "professionalSpecialityTextColor", client::setProfessionalSpecialityTextColor);
+        applyColor(call, "unreadMessagesBadgeColor", client::setUnreadMessagesBadgeBgColor);
+        applyColor(call, "professionalDescriptionColor", client::setProfessionalDescriptionColor);
+        applyColor(call, "disabledProfessionalColor", client::setDisabledProfessionalColor);
+        call.resolve();
+    }
+
+    /** Applies a parsed color to the given setter when the option is present and valid. */
+    private void applyColor(PluginCall call, String key, Consumer<Integer> setter) {
+        Integer color = color(call.getString(key));
+        if (color != null) {
+            setter.accept(color);
+        }
+    }
+
+    /** Parses a "#RRGGBB" or "#RRGGBBAA" hex string into an ARGB int. */
+    private static Integer color(String hex) {
+        if (hex == null) {
+            return null;
+        }
+        String value = hex.replace("#", "").trim();
+        try {
+            if (value.length() == 6) {
+                return 0xFF000000 | Integer.parseInt(value, 16);
+            }
+            if (value.length() == 8) {
+                long rgba = Long.parseLong(value, 16);
+                long red = (rgba >> 24) & 0xFF;
+                long green = (rgba >> 16) & 0xFF;
+                long blue = (rgba >> 8) & 0xFF;
+                long alpha = rgba & 0xFF;
+                return (int) ((alpha << 24) | (red << 16) | (green << 8) | blue);
+            }
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        return null;
     }
 
     /** Authenticates the user in the SDK. */

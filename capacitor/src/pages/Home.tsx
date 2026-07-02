@@ -15,7 +15,7 @@ import {
 import { chatbubblesOutline, logInOutline, logOutOutline, peopleOutline } from 'ionicons/icons';
 
 import { MeetingLawyers } from '../plugins/meeting-lawyers';
-import { ML_API_KEY, ML_ENVIRONMENT, ML_USER_ID } from '../config/constants';
+import { ML_API_KEY, ML_ENVIRONMENT, ML_THEME, ML_USER_ID } from '../config/constants';
 import './Home.css';
 
 type SdkStatus = 'missing-credentials' | 'configuring' | 'configured' | 'authenticated';
@@ -37,6 +37,7 @@ const Home: React.FC = () => {
     try {
       setError(null);
       await MeetingLawyers.configure({ apiKey: ML_API_KEY, environment: ML_ENVIRONMENT });
+      await MeetingLawyers.configureTheme(ML_THEME);
       const { authenticated } = await MeetingLawyers.isAuthenticated();
       setStatus(authenticated ? 'authenticated' : 'configured');
     } catch (e) {

@@ -26,6 +26,42 @@ To reuse it in your own Capacitor app, copy those three pieces and register the 
 - **Android**: register the plugin in [`MainActivity`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MainActivity.java)
   and add the maven repository + dependency (see below).
 
+## Usage
+
+Call the wrapper from your TypeScript in this order — configure once at startup, then the rest:
+
+```ts
+import { MeetingLawyers } from './plugins/meeting-lawyers';
+
+// 1. Initialize the SDK (once, at app startup)
+await MeetingLawyers.configure({ apiKey: ML_API_KEY, environment: 'DEV' });
+
+// 2. Apply your brand colors (optional). Colors are '#RRGGBB' or '#RRGGBBAA'
+await MeetingLawyers.configureTheme({
+  primaryColor: '#2E7D6B',
+  secondaryColor: '#2E7D6B',
+  navigationBarColor: '#2E7D6B',
+  outgoingMessageColor: '#2E7D6B',
+});
+
+// 3. Authenticate the user
+await MeetingLawyers.authenticate({ userId: ML_USER_ID });
+
+// 4. Open the native professional list (tapping a professional opens its chat)
+await MeetingLawyers.openProfessionalList();
+
+// …or open a chat with a specific professional directly
+await MeetingLawyers.openChatWithProfessional({ professionalHash: 'abc123' });
+
+// Helpers
+const { authenticated } = await MeetingLawyers.isAuthenticated();
+await MeetingLawyers.logout();
+```
+
+See [`src/pages/Home.tsx`](src/pages/Home.tsx) for the same flow wired to buttons, and
+[`src/plugins/meeting-lawyers/definitions.ts`](src/plugins/meeting-lawyers/definitions.ts) for the full API
+and every `ThemeOptions` color.
+
 ## Credentials
 
 Ask for demo credentials at [support@meetinglawyers.com](mailto:support@meetinglawyers.com), then set them in
@@ -78,7 +114,6 @@ You can also open a chat directly by professional hash from the home screen.
 
 ## Push notifications
 
-Not wired in this sample yet. The SDKs support push (FCM on both platforms plus a Notification
-Service Extension on iOS) — see the platform guides at
+Not wired in this sample yet. Push works over FCM on both platforms — see the platform guides at
 [developer.meetinglawyers.com](https://developer.meetinglawyers.com/). Firebase config files
 (`GoogleService-Info.plist`, `google-services.json`) are gitignored on purpose: supply your own.

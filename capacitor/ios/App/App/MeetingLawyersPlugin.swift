@@ -11,6 +11,7 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
     public let jsName = "MeetingLawyers"
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "configure", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "configureTheme", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "authenticate", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openProfessionalList", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openChatWithProfessional", returnType: CAPPluginReturnPromise),
@@ -40,6 +41,33 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
+    /// Applies the theme colors supported on iOS; unsupported keys are ignored.
+    @objc func configureTheme(_ call: CAPPluginCall) {
+        Task { @MainActor in
+            if let color = Self.color(call.getString("primaryColor")) { MeetingLawyersApp.setStyle(primaryColor: color) }
+            if let color = Self.color(call.getString("secondaryColor")) { MeetingLawyersApp.setStyle(secondaryColor: color) }
+            if let color = Self.color(call.getString("navigationBarColor")) { MeetingLawyersApp.setStyle(navigationColor: color) }
+            if let color = Self.color(call.getString("incomingMessageColor")) { MeetingLawyersApp.setStyle(incomingBubbleColor: color) }
+            if let color = Self.color(call.getString("outgoingMessageColor")) { MeetingLawyersApp.setStyle(outgoingBubbleColor: color) }
+            if let color = Self.color(call.getString("dividerColor")) { MeetingLawyersApp.setStyle(dividerColor: color) }
+            if let color = Self.color(call.getString("videoCallColor")) { MeetingLawyersApp.setStyle(videoCallColor: color) }
+            call.resolve()
+        }
+    }
+
+    /// Parses a "#RRGGBB" or "#RRGGBBAA" hex string into a UIColor.
+    private static func color(_ hex: String?) -> UIColor? {
+        guard let hex = hex else { return nil }
+        let value = hex.trimmingCharacters(in: CharacterSet(charactersIn: "# "))
+        guard value.count == 6 || value.count == 8, let rgba = UInt64(value, radix: 16) else { return nil }
+        let hasAlpha = value.count == 8
+        let red = CGFloat((rgba >> (hasAlpha ? 24 : 16)) & 0xFF) / 255
+        let green = CGFloat((rgba >> (hasAlpha ? 16 : 8)) & 0xFF) / 255
+        let blue = CGFloat((rgba >> (hasAlpha ? 8 : 0)) & 0xFF) / 255
+        let alpha = hasAlpha ? CGFloat(rgba & 0xFF) / 255 : 1
+        return UIColor(red: red, green: green, blue: blue, alpha: alpha)
+    }
+
     /// Authenticates the user in the SDK.
     @objc func authenticate(_ call: CAPPluginCall) {
         guard let userId = call.getString("userId"), !userId.isEmpty else {
@@ -56,7 +84,8 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    /// Presents the SDK professional list; tapping a professional opens its chat.
+    /// Opens the SDK professional list; tapping a professional opens its chat.
+    /// Pushes into an existing navigation controller when one is found; presents modally otherwise.
     @objc func openProfessionalList(_ call: CAPPluginCall) {
         Task { @MainActor in
             guard let listNavigationController = MeetingLawyersApp.professionalListViewController(
@@ -70,9 +99,33 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject("No view controller available to present from")
                 return
             }
-            viewController.present(listNavigationController, animated: true)
+            if let navigationController = Self.findNavigationController(from: viewController),
+               let listViewController = listNavigationController.viewControllers.first {
+                navigationController.pushViewController(listViewController, animated: true)
+            } else {
+                viewController.present(listNavigationController, animated: true)
+            }
             call.resolve()
         }
+    }
+
+    /// Finds the closest navigation controller in the view hierarchy, if any.
+    @MainActor
+    private static func findNavigationController(from viewController: UIViewController) -> UINavigationController? {
+        if let navigationController = viewController as? UINavigationController {
+            return navigationController
+        }
+        if let navigationController = viewController.navigationController {
+            return navigationController
+        }
+        if let tabBarController = viewController as? UITabBarController,
+           let selectedViewController = tabBarController.selectedViewController {
+            return findNavigationController(from: selectedViewController)
+        }
+        if let presentedViewController = viewController.presentedViewController {
+            return findNavigationController(from: presentedViewController)
+        }
+        return nil
     }
 
     /// Opens the chat with a specific professional by hash.
