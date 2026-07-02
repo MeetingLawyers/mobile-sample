@@ -11,9 +11,8 @@
 # production
 /dist
 
-# Firebase configs (supply your own, never commit them)
-GoogleService-Info.plist
-google-services.json
+# Firebase config committed on purpose: client config for com.meetinglawyers.sdk.sample
+# (Firebase client keys are not secrets — security is enforced by Rules/App Check).
 
 # misc
 .DS_Store

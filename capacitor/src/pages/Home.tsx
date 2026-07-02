@@ -12,7 +12,13 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { chatbubblesOutline, logInOutline, logOutOutline, peopleOutline } from 'ionicons/icons';
+import {
+  chatbubblesOutline,
+  logInOutline,
+  logOutOutline,
+  notificationsOutline,
+  peopleOutline,
+} from 'ionicons/icons';
 
 import { MeetingLawyers } from '../plugins/meeting-lawyers';
 import { ML_API_KEY, ML_ENVIRONMENT, ML_THEME, ML_USER_ID } from '../config/constants';
@@ -24,6 +30,7 @@ const Home: React.FC = () => {
   const [status, setStatus] = useState<SdkStatus>('configuring');
   const [error, setError] = useState<string | null>(null);
   const [professionalHash, setProfessionalHash] = useState('');
+  const [pushEnabled, setPushEnabled] = useState(false);
 
   useEffect(() => {
     configureSdk();
@@ -69,6 +76,16 @@ const Home: React.FC = () => {
     try {
       setError(null);
       await MeetingLawyers.openChatWithProfessional({ professionalHash });
+    } catch (e) {
+      setError(describe(e));
+    }
+  };
+
+  const enablePush = async () => {
+    try {
+      setError(null);
+      await MeetingLawyers.registerForPushNotifications();
+      setPushEnabled(true);
     } catch (e) {
       setError(describe(e));
     }
@@ -145,6 +162,17 @@ const Home: React.FC = () => {
           >
             <IonIcon slot="start" icon={chatbubblesOutline} />
             Open chat with professional
+          </IonButton>
+
+          <IonButton
+            expand="block"
+            fill="outline"
+            onClick={enablePush}
+            disabled={status !== 'authenticated' || pushEnabled}
+            data-testid="enable-push"
+          >
+            <IonIcon slot="start" icon={notificationsOutline} />
+            {pushEnabled ? 'Push notifications enabled' : 'Enable push notifications'}
           </IonButton>
 
           <IonButton

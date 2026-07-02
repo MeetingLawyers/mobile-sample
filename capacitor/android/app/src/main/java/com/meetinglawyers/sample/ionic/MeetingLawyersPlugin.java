@@ -1,10 +1,18 @@
 package com.meetinglawyers.sample.ionic;
 
+import android.Manifest;
+import android.os.Build;
+
 import com.getcapacitor.JSObject;
+import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.meetinglawyers.sdk.CustomerSdkBuildMode;
 import com.meetinglawyers.sdk.MeetingLawyersClient;
 import com.meetinglawyers.sdk.MeetingLawyersSDK;
@@ -16,11 +24,16 @@ import java.util.function.Consumer;
 
 /**
  * Capacitor bridge to the MeetingLawyers Android SDK.
- * Self-contained: copy this file (plus src/plugins/meeting-lawyers/) into your
- * own Capacitor project and register it in your MainActivity.
+ * Self-contained: copy this file (plus src/plugins/meeting-lawyers/ and
+ * MeetingLawyersFirebaseService.java for push) into your own Capacitor project
+ * and register it in your MainActivity.
  */
-@CapacitorPlugin(name = "MeetingLawyers")
+@CapacitorPlugin(name = "MeetingLawyers", permissions = {
+        @Permission(strings = {Manifest.permission.POST_NOTIFICATIONS}, alias = MeetingLawyersPlugin.NOTIFICATIONS)
+})
 public class MeetingLawyersPlugin extends Plugin {
+
+    static final String NOTIFICATIONS = "notifications";
 
     /** Initializes the SDK with the company API key and target environment. */
     @PluginMethod
@@ -144,6 +157,42 @@ public class MeetingLawyersPlugin extends Plugin {
         }
         getActivity().runOnUiThread(() -> {
             MeetingLawyersSDK.Companion.getClientInstance().openChatWithProfessional(getActivity(), professionalHash);
+            call.resolve();
+        });
+    }
+
+    /** Asks for notification permission and registers the FCM token with the SDK. */
+    @PluginMethod
+    public void registerForPushNotifications(PluginCall call) {
+        if (notConfigured(call)) {
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && getPermissionState(NOTIFICATIONS) != PermissionState.GRANTED) {
+            requestPermissionForAlias(NOTIFICATIONS, call, "notificationsPermissionCallback");
+            return;
+        }
+        registerPushToken(call);
+    }
+
+    /** Continues push registration after the permission prompt (token works even if denied). */
+    @PermissionCallback
+    private void notificationsPermissionCallback(PluginCall call) {
+        registerPushToken(call);
+    }
+
+    /** Fetches the current FCM token and hands it to the SDK. */
+    private void registerPushToken(PluginCall call) {
+        if (FirebaseApp.getApps(getContext()).isEmpty()) {
+            call.reject("Firebase is not configured. Add google-services.json to android/app.");
+            return;
+        }
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+            if (!task.isSuccessful() || task.getResult() == null) {
+                call.reject("Could not fetch the FCM token", (Exception) task.getException());
+                return;
+            }
+            MeetingLawyersSDK.Companion.getClientInstance().onNewTokenReceived(task.getResult());
             call.resolve();
         });
     }

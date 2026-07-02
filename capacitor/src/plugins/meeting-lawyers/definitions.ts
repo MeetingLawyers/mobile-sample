@@ -72,6 +72,13 @@ export interface MeetingLawyersPlugin {
   openProfessionalList(): Promise<void>;
   /** Opens the chat with a specific professional. */
   openChatWithProfessional(options: OpenChatOptions): Promise<void>;
+  /**
+   * Asks for notification permission and registers the device FCM token with
+   * the SDK. Requires the platform Firebase config file (GoogleService-Info.plist /
+   * google-services.json); call it after authenticate() so the token is linked
+   * to the user.
+   */
+  registerForPushNotifications(): Promise<void>;
   /** Whether a user is currently authenticated in the SDK. */
   isAuthenticated(): Promise<IsAuthenticatedResult>;
   /** Logs the user out of the SDK. */

@@ -1,6 +1,13 @@
 import Capacitor
 import MeetingLawyers
 import UIKit
+import UserNotifications
+#if canImport(FirebaseCore)
+import FirebaseCore
+#endif
+#if canImport(FirebaseMessaging)
+import FirebaseMessaging
+#endif
 
 /// Capacitor bridge to the MeetingLawyers iOS SDK.
 /// Self-contained: copy this file (plus `src/plugins/meeting-lawyers/`) into your
@@ -15,6 +22,7 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "authenticate", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openProfessionalList", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openChatWithProfessional", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "registerForPushNotifications", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "isAuthenticated", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "logout", returnType: CAPPluginReturnPromise)
     ]
@@ -145,6 +153,30 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
+    /// Asks for notification permission and registers the FCM token with the SDK.
+    @objc func registerForPushNotifications(_ call: CAPPluginCall) {
+        #if canImport(FirebaseCore) && canImport(FirebaseMessaging)
+        Task { @MainActor in
+            guard FirebaseApp.app() != nil
+                    || Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil else {
+                call.reject("Firebase is not configured. Add GoogleService-Info.plist to the iOS app.")
+                return
+            }
+            if FirebaseApp.app() == nil {
+                FirebaseApp.configure()
+            }
+            Messaging.messaging().delegate = self
+            UNUserNotificationCenter.current().delegate = self
+            let options: UNAuthorizationOptions = [.alert, .badge, .sound]
+            _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: options)
+            UIApplication.shared.registerForRemoteNotifications()
+            call.resolve()
+        }
+        #else
+        call.reject("FirebaseMessaging is not linked. Add the firebase-ios-sdk package to enable push.")
+        #endif
+    }
+
     /// Returns whether a user is currently authenticated in the SDK.
     @objc func isAuthenticated(_ call: CAPPluginCall) {
         call.resolve(["authenticated": MeetingLawyersApp.isAuthenticated()])
@@ -160,5 +192,43 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject("Logout failed: \(error.localizedDescription)")
             }
         }
+    }
+}
+
+#if canImport(FirebaseMessaging)
+extension MeetingLawyersPlugin: MessagingDelegate {
+    /// Forwards every FCM token refresh to the SDK.
+    public func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        guard let fcmToken else { return }
+        Task {
+            try? await MeetingLawyersApp.setFirebaseMessagingToken(token: fcmToken)
+        }
+    }
+}
+#endif
+
+extension MeetingLawyersPlugin: UNUserNotificationCenterDelegate {
+    /// Lets the SDK handle its own pushes in foreground; shows the rest normally.
+    public func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                       willPresent notification: UNNotification,
+                                       withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        if MeetingLawyersApp.isMeetingLawyersPush(userInfo: notification.request.content.userInfo) {
+            _ = MeetingLawyersApp.userNotificationCenter(willPresent: notification.request, completionHandler: completionHandler)
+            return
+        }
+        completionHandler([.banner, .badge, .sound])
+    }
+
+    /// Lets the SDK react to taps on its own pushes (e.g. open the chat).
+    public func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                       didReceive response: UNNotificationResponse,
+                                       withCompletionHandler completionHandler: @escaping () -> Void) {
+        if MeetingLawyersApp.isMeetingLawyersPush(userInfo: response.notification.request.content.userInfo) {
+            _ = MeetingLawyersApp.userNotificationCenter(didReceive: response.notification.request) { _ in
+                completionHandler()
+            }
+            return
+        }
+        completionHandler()
     }
 }
