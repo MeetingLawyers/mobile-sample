@@ -128,6 +128,9 @@ Push works over FCM on both platforms. The wrapper exposes one method:
 await MeetingLawyers.registerForPushNotifications();
 ```
 
+In this sample it is called right before `openProfessionalList()` (see `Home.tsx`), so the user
+gets the permission prompt when entering the SDK flow instead of via a dedicated button.
+
 Message and token forwarding are already wired natively:
 
 - **iOS**: the plugin acts as `MessagingDelegate` + `UNUserNotificationCenterDelegate` and hands

@@ -39,16 +39,6 @@ export interface ThemeOptions {
   outgoingMessageColor?: string;
   /** Divider background. iOS only. */
   dividerColor?: string;
-  /** Video call UI color. iOS only. */
-  videoCallColor?: string;
-  /** Professional speciality text. Android only. */
-  professionalSpecialityTextColor?: string;
-  /** Unread messages badge background. Android only. */
-  unreadMessagesBadgeColor?: string;
-  /** Professional description text. Android only. */
-  professionalDescriptionColor?: string;
-  /** Disabled professional color. Android only. */
-  disabledProfessionalColor?: string;
 }
 
 /**

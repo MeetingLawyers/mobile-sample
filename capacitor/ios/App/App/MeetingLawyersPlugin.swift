@@ -58,7 +58,6 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
             if let color = Self.color(call.getString("incomingMessageColor")) { MeetingLawyersApp.setStyle(incomingBubbleColor: color) }
             if let color = Self.color(call.getString("outgoingMessageColor")) { MeetingLawyersApp.setStyle(outgoingBubbleColor: color) }
             if let color = Self.color(call.getString("dividerColor")) { MeetingLawyersApp.setStyle(dividerColor: color) }
-            if let color = Self.color(call.getString("videoCallColor")) { MeetingLawyersApp.setStyle(videoCallColor: color) }
             call.resolve()
         }
     }

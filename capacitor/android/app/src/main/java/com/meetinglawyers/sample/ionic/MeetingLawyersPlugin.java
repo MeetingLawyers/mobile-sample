@@ -69,10 +69,6 @@ public class MeetingLawyersPlugin extends Plugin {
         applyColor(call, "navigationBarColor", client::setNavigationBarColor);
         applyColor(call, "incomingMessageColor", client::setIncomingMessageBgColor);
         applyColor(call, "outgoingMessageColor", client::setOngoingMessageBgColor);
-        applyColor(call, "professionalSpecialityTextColor", client::setProfessionalSpecialityTextColor);
-        applyColor(call, "unreadMessagesBadgeColor", client::setUnreadMessagesBadgeBgColor);
-        applyColor(call, "professionalDescriptionColor", client::setProfessionalDescriptionColor);
-        applyColor(call, "disabledProfessionalColor", client::setDisabledProfessionalColor);
         call.resolve();
     }
 
