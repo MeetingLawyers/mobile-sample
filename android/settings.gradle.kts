@@ -14,9 +14,10 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/MeetingLawyers/android-sdk-chat/")
             credentials {
-                // ask credentials to support@meetinglawyers.com
-                username = ""
-                password = ""
+                // ask credentials to support@meetinglawyers.com and set them in
+                // ~/.gradle/gradle.properties or as environment variables — never commit them.
+                username = providers.gradleProperty("GPR_USER").orNull ?: System.getenv("GPR_USER") ?: ""
+                password = providers.gradleProperty("GPR_TOKEN").orNull ?: System.getenv("GPR_TOKEN") ?: ""
             }
         }
     }

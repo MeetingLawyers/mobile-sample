@@ -1,6 +1,10 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
+    // The MeetingLawyers SDK pulls in Firebase Crashlytics; once Firebase is
+    // initialized this plugin is required or the app crashes on launch.
+    id("com.google.firebase.crashlytics")
 }
 
 android {
