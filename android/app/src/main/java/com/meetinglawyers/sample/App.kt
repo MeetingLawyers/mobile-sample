@@ -1,12 +1,14 @@
 package com.meetinglawyers.sample
 
 import android.app.Application
-import com.meetinglawyers.sdk.MeetingLawyersClient
-import com.meetinglawyers.sdk.data.CustomerSdkBuildMode
+import com.meetinglawyers.sdk.CustomerSdkBuildMode
+import com.meetinglawyers.sdk.MeetingLawyersSDK
+import java.util.Locale
 
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        MeetingLawyersClient.newInstance(this, Constants.apiKey, CustomerSdkBuildMode.DEV)
+        MeetingLawyersSDK(this, Constants.apiKey, CustomerSdkBuildMode.DEV, Locale.getDefault())
+            .build()
     }
 }

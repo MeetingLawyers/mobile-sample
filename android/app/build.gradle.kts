@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.meetinglawyers.sample"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.meetinglawyers.sdk.sample"
         minSdk = 23
-        targetSdk = 33
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -31,19 +31,20 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 }
 
 dependencies {
 
     // sample dependencies
-    implementation("com.meetinglawyers:sdk:1.1.58")
-    implementation("com.google.firebase:firebase-messaging-ktx:23.4.0")
+    implementation("com.meetinglawyers:sdk:2.1.15")
+    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+    implementation("com.google.firebase:firebase-messaging")
 
     // android base dependencies
     implementation("androidx.core:core-ktx:1.9.0")

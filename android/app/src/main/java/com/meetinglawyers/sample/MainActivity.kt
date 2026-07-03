@@ -7,7 +7,8 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.meetinglawyers.sdk.MeetingLawyersClient
+import com.meetinglawyers.sdk.MeetingLawyersSDK
+import com.meetinglawyers.sdk.SDKCallbackWithoutData
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,14 +21,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun signInAndLaunchProfessionalList() {
-        MeetingLawyersClient.instance?.authenticate(
-            Constants.userId, object: MeetingLawyersClient.AuthenticationListener {
-                override fun onAuthenticated() {
-                    launchProfessionalList()
+        MeetingLawyersSDK.getClientInstance().authenticate(
+            Constants.userId, object : SDKCallbackWithoutData {
+                override fun onSuccess() {
+                    runOnUiThread { launchProfessionalList() }
                 }
-                override fun onAuthenticationError(throwable: Throwable) {
-                    Toast.makeText(this@MainActivity, "Error sign in", Toast.LENGTH_SHORT).show()
-                    println(throwable.message)
+
+                override fun onError(message: String?) {
+                    runOnUiThread {
+                        Toast.makeText(this@MainActivity, "Error sign in", Toast.LENGTH_SHORT).show()
+                    }
+                    println(message)
                 }
             })
     }
@@ -47,5 +51,4 @@ class MainActivity : AppCompatActivity() {
             .add(frameLayout.id, ProfessionalListFragment())
             .commit()
     }
-
 }
