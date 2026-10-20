@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "iOS: run",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run ios"
+        },
+        {
+            "name": "Android: run",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run android"
+        },
+        {
+            "name": "Web: debug in Chrome",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}",
+            "preLaunchTask": "Web: dev server"
+        }
+    ]
+}
