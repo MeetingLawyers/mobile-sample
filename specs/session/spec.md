@@ -43,6 +43,6 @@ The wrapper MUST sign the user out of the SDK.
 
 | Sample | Where |
 |---|---|
-| `ios/` | — |
+| `ios/` | Status line and "Log out" on the home screen |
 | `android/` | — |
 | `capacitor/` | `Home.tsx` → status line and "Log out" |

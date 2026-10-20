@@ -42,6 +42,6 @@ SDK screens feel part of the app. When there is no navigation to push into, it M
 
 | Sample | Where |
 |---|---|
-| `ios/` | `ViewController.swift` → `launchProfessionalList()` (presented) |
+| `ios/` | `MeetingLawyersIntegration.openProfessionalList`, pushed onto the app navigation |
 | `android/` | `ProfessionalListFragment.kt` (embedded view) |
 | `capacitor/` | `Home.tsx` → `MeetingLawyers.openProfessionalList()` |

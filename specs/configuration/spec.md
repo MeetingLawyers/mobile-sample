@@ -48,6 +48,6 @@ The wrapper MUST reject the call when the API key is missing or empty.
 
 | Sample | Where |
 |---|---|
-| `ios/` | `ViewController.swift`, before opening the list (always `DEV` today) |
+| `ios/` | `MeetingLawyersIntegration.configure`, called when the home screen loads |
 | `android/` | `App.kt`, on application start |
 | `capacitor/` | `Home.tsx` → `MeetingLawyers.configure()` |

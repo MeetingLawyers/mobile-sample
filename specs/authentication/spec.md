@@ -36,6 +36,6 @@ company. It MUST be called after configure.
 
 | Sample | Where |
 |---|---|
-| `ios/` | `ViewController.swift` → `launchSdk()` |
+| `ios/` | `MeetingLawyersIntegration.authenticate`, from "Sign in" |
 | `android/` | `MainActivity.kt` |
 | `capacitor/` | `Home.tsx` → `MeetingLawyers.authenticate()` |

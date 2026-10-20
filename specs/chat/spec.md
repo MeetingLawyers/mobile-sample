@@ -35,6 +35,6 @@ The wrapper MUST open the chat with the professional identified by the given has
 
 | Sample | Where |
 |---|---|
-| `ios/` | — |
+| `ios/` | `MeetingLawyersIntegration.openChat`, from "Open chat" with a hash |
 | `android/` | — |
 | `capacitor/` | `Home.tsx` → "Open chat" with a professional hash |

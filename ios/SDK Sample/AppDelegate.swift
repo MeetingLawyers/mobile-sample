@@ -1,39 +1,20 @@
-//
-//  AppDelegate.swift
-//  SDK Sample
-//
-//  Created by Manel MeetingLawyers on 27/7/22.
-//
-
+import FirebaseCore
 import UIKit
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    private let pushNotificationSample = PushNotificationSample()
-
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Push notifications: requires GoogleService-Info.plist (bundled) and the
-        // apiKey/userId constants set in Constants.swift to receive messages.
-        pushNotificationSample.configurePush(application: application)
+final class AppDelegate: UIResponder, UIApplicationDelegate {
+    /// Configures Firebase and takes over push delivery before any notification can arrive.
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        FirebaseApp.configure()
+        MeetingLawyersIntegration.shared.startHandlingPushNotifications()
         return true
     }
 
-    // MARK: UISceneSession Lifecycle
-
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        // Called when a new scene session is being created.
-        // Use this method to select a configuration to create the new scene with.
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    /// Uses the scene configuration declared in Info.plist.
+    func application(_ application: UIApplication,
+                     configurationForConnecting connectingSceneSession: UISceneSession,
+                     options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
-
-    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
-        // Called when the user discards a scene session.
-        // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-        // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
-    }
-
-
 }
-

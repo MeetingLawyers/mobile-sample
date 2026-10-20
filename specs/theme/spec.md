@@ -55,6 +55,6 @@ supports, ignoring the rest.
 
 | Sample | Where |
 |---|---|
-| `ios/` | `ViewController.swift` → `configStyle()` (primary, secondary, logo and bar buttons) |
+| `ios/` | `MeetingLawyersIntegration.configureTheme` (brand color and navigation logo) |
 | `android/` | — |
 | `capacitor/` | `constants.ts` → `ML_THEME`, applied after configure |

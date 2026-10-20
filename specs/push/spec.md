@@ -58,6 +58,6 @@ The wrapper MUST hand MeetingLawyers pushes to the SDK and MUST leave every othe
 
 | Sample | Where |
 |---|---|
-| `ios/` | `PushNotificationSample.swift`, registered on app launch |
+| `ios/` | `MeetingLawyersIntegration` push extension: delegates set on launch, token sent after authenticate |
 | `android/` | `SampleMessagingService.kt` |
 | `capacitor/` | `Home.tsx`, right before opening the list |
