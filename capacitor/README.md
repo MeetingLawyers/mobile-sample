@@ -71,25 +71,19 @@ and every `ThemeOptions` color.
 
 ## Credentials
 
-Ask for demo credentials at [support@meetinglawyers.com](mailto:support@meetinglawyers.com), then set them in
-[`src/config/constants.ts`](src/config/constants.ts):
-
-```ts
-export const ML_API_KEY = '';               // your company API key
-export const ML_USER_ID = '';               // a user identifier valid for that API key
-export const ML_ENVIRONMENT: 'DEV' | 'PROD' = 'DEV';
-```
-
-### Android maven credentials
-
-The Android SDK is served from GitHub Packages, which requires credentials even for public consumers.
-Provide them as gradle properties or environment variables (`GPR_USER` / `GPR_TOKEN`) — never commit them:
+Ask for demo credentials at [support@meetinglawyers.com](mailto:support@meetinglawyers.com), then fill in
+the repo-root `.env` (git-ignored) — see the [root README](../README.md#credentials):
 
 ```bash
-# ~/.gradle/gradle.properties
-GPR_USER=your_github_user
-GPR_TOKEN=your_token_with_read_packages
+cp ../.env.example ../.env
 ```
+
+Only the `ML_*` values reach the web bundle ([`vite.config.ts`](vite.config.ts));
+[`src/config/constants.ts`](src/config/constants.ts) reads them. If you copy the wrapper into your own
+app, pass your own values to `configure()` / `authenticate()` however your app manages configuration.
+
+The Android build reads `GPR_USER` / `GPR_TOKEN` from the same `.env`, falling back to
+`~/.gradle/gradle.properties` or environment variables.
 
 ## Run it
 
@@ -116,7 +110,7 @@ Predefined tasks are also available under **Terminal → Run Task…** (`iOS: ru
 `Cap: sync`, `iOS: open in Xcode`, …), and `⇧⌘B` runs the web build. `F5` starts the Vite dev server
 with the Chrome debugger for the web layer (native plugin calls only work on device/simulator).
 
-Once running: **Sign in** → **Open professional list** → tap a professional to chat with them.
+Once running (with `.env` filled in): **Sign in** → **Open professional list** → tap a professional to chat with them.
 You can also open a chat directly by professional hash from the home screen.
 
 ## Push notifications

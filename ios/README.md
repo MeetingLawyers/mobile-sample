@@ -1,4 +1,4 @@
-# iOS Meeting Lawyers SDK Sample
+# MeetingLawyers iOS SDK Sample
 
 This is a sample project for the iOS Meeting Lawyers SDK. You can use it to test and understand how the SDK works.
 
@@ -35,10 +35,8 @@ pod install
 
 ## Credentials
 
-1. Open the project and locate the `Constants` file.
+Ask for demo credentials at [support@meetinglawyers.com](mailto:support@meetinglawyers.com), then fill in
+the repo-root `.env` (git-ignored) — see the [root README](../README.md#credentials).
 
-2. Update the file with your credentials.
-
-
-Note: If you do not have your credentials yet, please contact our support team at support@meetinglawyers.com.
-
+`Config.xcconfig` includes that file, `Info.plist` exposes `ML_API_KEY`, `ML_USER_ID` and `ML_ENVIRONMENT`,
+and [`Constants.swift`](SDK%20Sample/Constants.swift) reads them. Rebuild after changing `.env`.
