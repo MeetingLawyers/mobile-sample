@@ -49,5 +49,5 @@ The wrapper MUST reject the call when the API key is missing or empty.
 | Sample | Where |
 |---|---|
 | `ios/` | `MeetingLawyersIntegration.configure`, called when the home screen loads |
-| `android/` | `App.kt`, on application start |
+| `android/` | `MeetingLawyersIntegration.configure`, from `App.onCreate` |
 | `capacitor/` | `Home.tsx` → `MeetingLawyers.configure()` |

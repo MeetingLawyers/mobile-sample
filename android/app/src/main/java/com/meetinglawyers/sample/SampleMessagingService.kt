@@ -2,27 +2,17 @@ package com.meetinglawyers.sample
 
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.meetinglawyers.sdk.MeetingLawyersSDK
 
+/** Forwards FCM messages and token refreshes; if your app has its own service, add these two calls to it. */
 class SampleMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-
-        /* Your code to process remoteMessage */
-
-        /* Redirect MeetingLawyers pushes to the SDK */
-        val data = remoteMessage.data["data"] ?: return
-        if (MeetingLawyersSDK.isInitialized()) {
-            MeetingLawyersSDK.getClientInstance().onPushMessageReceived(data)
-        }
+        // MeetingLawyers pushes go to the SDK; handle the rest as your app usually does.
+        MeetingLawyersIntegration.onMessageReceived(remoteMessage.data)
     }
 
-    override fun onNewToken(newToken: String) {
-        super.onNewToken(newToken)
-
-        /* Register new push token */
-        if (MeetingLawyersSDK.isInitialized()) {
-            MeetingLawyersSDK.getClientInstance().onNewTokenReceived(newToken)
-        }
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        MeetingLawyersIntegration.onNewToken(token)
     }
 }

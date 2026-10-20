@@ -43,5 +43,5 @@ SDK screens feel part of the app. When there is no navigation to push into, it M
 | Sample | Where |
 |---|---|
 | `ios/` | `MeetingLawyersIntegration.openProfessionalList`, pushed onto the app navigation |
-| `android/` | `ProfessionalListFragment.kt` (embedded view) |
+| `android/` | `MeetingLawyersIntegration.openProfessionalList`, opened on top of the activity stack |
 | `capacitor/` | `Home.tsx` → `MeetingLawyers.openProfessionalList()` |

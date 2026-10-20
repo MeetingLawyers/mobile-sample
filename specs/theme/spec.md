@@ -56,5 +56,5 @@ supports, ignoring the rest.
 | Sample | Where |
 |---|---|
 | `ios/` | `MeetingLawyersIntegration.configureTheme` (brand color and navigation logo) |
-| `android/` | — |
+| `android/` | `MeetingLawyersIntegration.configureTheme` (brand color), from `App.onCreate` |
 | `capacitor/` | `constants.ts` → `ML_THEME`, applied after configure |

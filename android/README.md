@@ -1,10 +1,24 @@
 # MeetingLawyers Android SDK Sample
 
-Native Android (Kotlin) sample that initializes the MeetingLawyers SDK, authenticates a user, shows the
-professional list and receives push notifications over FCM.
+Native Android (Kotlin) sample that configures the MeetingLawyers SDK, authenticates a user, opens the
+professional list or a chat, logs out and receives push notifications over FCM.
 
 Check the full documentation at
 [developer.meetinglawyers.com](https://developer.meetinglawyers.com/docs/getting-started).
+
+## How the integration works
+
+Every SDK call lives in one file you can copy into your app:
+
+| File | Role |
+|------|------|
+| [`MeetingLawyersIntegration.kt`](app/src/main/java/com/meetinglawyers/sample/MeetingLawyersIntegration.kt) | `configure`, `configureTheme`, `authenticate`, `openProfessionalList`, `openChat`, `isAuthenticated`, `logout`, and push forwarding |
+| [`App.kt`](app/src/main/java/com/meetinglawyers/sample/App.kt) | Configures the SDK in `Application.onCreate` |
+| [`SampleMessagingService.kt`](app/src/main/java/com/meetinglawyers/sample/SampleMessagingService.kt) | Forwards FCM messages and token refreshes. If your app already has a `FirebaseMessagingService`, add these two calls to it |
+| [`MainActivity.kt`](app/src/main/java/com/meetinglawyers/sample/MainActivity.kt) | The home screen, and the Android 13+ notification permission |
+
+The MeetingLawyers SDK pulls in Firebase Crashlytics, so the `com.google.firebase.crashlytics` Gradle plugin
+is required once `google-services.json` is present. The contract each call fulfils is in [`specs/`](../specs/).
 
 ## Credentials
 
@@ -23,3 +37,6 @@ Open this `android/` folder in Android Studio and run the `app` configuration, o
 ```bash
 ./gradlew installDebug
 ```
+
+**Sign in** → **Open professional list** → tap a professional to chat. You can also open a chat directly by
+professional hash.

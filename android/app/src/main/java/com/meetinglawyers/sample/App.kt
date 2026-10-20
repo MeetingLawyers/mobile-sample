@@ -1,15 +1,14 @@
 package com.meetinglawyers.sample
 
 import android.app.Application
-import com.meetinglawyers.sdk.CustomerSdkBuildMode
-import com.meetinglawyers.sdk.MeetingLawyersSDK
-import java.util.Locale
 
 class App : Application() {
+    /** Configures the SDK at startup, unless the `.env` credentials are missing. */
     override fun onCreate() {
         super.onCreate()
-        val buildMode = if (Constants.isProduction) CustomerSdkBuildMode.PROD else CustomerSdkBuildMode.DEV
-        MeetingLawyersSDK(this, Constants.apiKey, buildMode, Locale.getDefault())
-            .build()
+        if (Constants.apiKey.isNotEmpty()) {
+            MeetingLawyersIntegration.configure(this, Constants.apiKey, Constants.isProduction)
+            MeetingLawyersIntegration.configureTheme(Constants.brandColor)
+        }
     }
 }

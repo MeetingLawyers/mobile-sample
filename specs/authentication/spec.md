@@ -37,5 +37,5 @@ company. It MUST be called after configure.
 | Sample | Where |
 |---|---|
 | `ios/` | `MeetingLawyersIntegration.authenticate`, from "Sign in" |
-| `android/` | `MainActivity.kt` |
+| `android/` | `MeetingLawyersIntegration.authenticate`, from "Sign in" |
 | `capacitor/` | `Home.tsx` → `MeetingLawyers.authenticate()` |

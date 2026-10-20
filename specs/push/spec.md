@@ -59,5 +59,5 @@ The wrapper MUST hand MeetingLawyers pushes to the SDK and MUST leave every othe
 | Sample | Where |
 |---|---|
 | `ios/` | `MeetingLawyersIntegration` push extension: delegates set on launch, token sent after authenticate |
-| `android/` | `SampleMessagingService.kt` |
+| `android/` | `SampleMessagingService.kt` + `MeetingLawyersIntegration`: token sent after authenticate, permission asked on Android 13+ |
 | `capacitor/` | `Home.tsx`, right before opening the list |
