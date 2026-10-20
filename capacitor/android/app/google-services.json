@@ -29,13 +29,6 @@
             {
               "client_id": "670147564619-3nfdidend6asp7svlntg5pl5tte898hq.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "670147564619-1qqiq7rpuonjgrurp2o13hndsv3sa8ds.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.lisaseguros.lawyers.dev"
-              }
             }
           ]
         }
