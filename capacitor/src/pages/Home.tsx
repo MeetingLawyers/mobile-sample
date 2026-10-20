@@ -100,7 +100,7 @@ const Home: React.FC = () => {
         </p>
         {status === 'missing-credentials' && (
           <IonNote color="warning">
-            Set ML_API_KEY and ML_USER_ID in <code>src/config/constants.ts</code>, then rebuild.
+            Set ML_API_KEY and ML_USER_ID in the repo-root <code>.env</code>, then rebuild.
           </IonNote>
         )}
         {error && (
