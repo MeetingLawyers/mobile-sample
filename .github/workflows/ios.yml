@@ -1,0 +1,27 @@
+name: iOS
+
+on:
+  push:
+    branches: [master]
+    paths: ['ios/**', '.github/workflows/ios.yml']
+  pull_request:
+    paths: ['ios/**', '.github/workflows/ios.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        working-directory: ios
+        run: >
+          xcodebuild build -project "SDK Sample.xcodeproj" -scheme "SDK Sample"
+          -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO

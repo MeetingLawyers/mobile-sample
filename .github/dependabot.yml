@@ -1,0 +1,32 @@
+version: 2
+
+# GitHub Packages (MeetingLawyers Android SDK) needs the GPR_USER / GPR_TOKEN Dependabot secrets.
+registries:
+  meetinglawyers-maven:
+    type: maven-repository
+    url: https://maven.pkg.github.com/MeetingLawyers/android-sdk-chat
+    username: ${{ secrets.GPR_USER }}
+    password: ${{ secrets.GPR_TOKEN }}
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+
+  - package-ecosystem: npm
+    directory: /capacitor
+    schedule:
+      interval: monthly
+    groups:
+      npm:
+        patterns: ['*']
+
+  - package-ecosystem: gradle
+    directories: ['/android', '/capacitor/android']
+    registries: [meetinglawyers-maven]
+    schedule:
+      interval: monthly
+    groups:
+      gradle:
+        patterns: ['*']
