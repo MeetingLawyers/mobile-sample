@@ -6,6 +6,9 @@ import { defineConfig } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Demo credentials live in the repo-root .env; only ML_* values reach the app bundle.
+  envDir: '..',
+  envPrefix: 'ML_',
   plugins: [
     react(),
     legacy()

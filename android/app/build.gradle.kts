@@ -7,6 +7,12 @@ plugins {
     id("com.google.firebase.crashlytics")
 }
 
+// Demo credentials live in the repo-root .env (git-ignored), see ../.env.example.
+val dotEnv: Map<String, String> = rootProject.file("../.env").takeIf { it.exists() }?.readLines().orEmpty()
+    .map { it.split("=", limit = 2) }
+    .filter { it.size == 2 && !it[0].trimStart().startsWith("#") }
+    .associate { (key, value) -> key.trim() to value.trim() }
+
 android {
     namespace = "com.meetinglawyers.sample"
     compileSdk = 35
@@ -19,6 +25,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        listOf("ML_API_KEY", "ML_USER_ID", "ML_ENVIRONMENT").forEach { key ->
+            buildConfigField("String", key, "\"${dotEnv[key].orEmpty()}\"")
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {

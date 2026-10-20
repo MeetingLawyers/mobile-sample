@@ -6,6 +6,15 @@ pluginManagement {
 
     }
 }
+// Credentials live in the repo-root .env (git-ignored), see ../.env.example.
+val dotEnv: Map<String, String> = file("../.env").takeIf { it.exists() }?.readLines().orEmpty()
+    .map { it.split("=", limit = 2) }
+    .filter { it.size == 2 && !it[0].trimStart().startsWith("#") }
+    .associate { (key, value) -> key.trim() to value.trim() }
+
+fun credential(key: String): String =
+    dotEnv[key]?.takeIf { it.isNotBlank() } ?: providers.gradleProperty(key).orNull ?: System.getenv(key) ?: ""
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -14,14 +23,12 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/MeetingLawyers/android-sdk-chat/")
             credentials {
-                // ask credentials to support@meetinglawyers.com and set them in
-                // ~/.gradle/gradle.properties or as environment variables — never commit them.
-                username = providers.gradleProperty("GPR_USER").orNull ?: System.getenv("GPR_USER") ?: ""
-                password = providers.gradleProperty("GPR_TOKEN").orNull ?: System.getenv("GPR_TOKEN") ?: ""
+                // .env first, then ~/.gradle/gradle.properties, then environment variables.
+                username = credential("GPR_USER")
+                password = credential("GPR_TOKEN")
             }
         }
     }
-
 }
 
 rootProject.name = "Android Sample"

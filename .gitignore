@@ -1,5 +1,7 @@
-
 .DS_Store
 
-# GoogleService-Info.plist committed on purpose: Firebase client config for
-# com.meetinglawyers.sdk.sample (client keys are not secrets — Rules/App Check enforce access).
+# Local credentials: copy .env.example to .env and fill it in. Never commit it.
+.env
+
+# Firebase client config (GoogleService-Info.plist / google-services.json) is committed on purpose:
+# it belongs to com.meetinglawyers.sdk.sample and Firebase client keys are not secrets.

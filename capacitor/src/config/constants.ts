@@ -1,10 +1,10 @@
-// Update these constants with your values.
+// Demo credentials come from the repo-root .env (git-ignored), see ../.env.example.
 // Ask for credentials at support@meetinglawyers.com
-export const ML_API_KEY = '';
-export const ML_USER_ID = '';
+export const ML_API_KEY: string = import.meta.env.ML_API_KEY ?? '';
+export const ML_USER_ID: string = import.meta.env.ML_USER_ID ?? '';
 
-// 'DEV' points to the MeetingLawyers demo environment, 'PROD' to production.
-export const ML_ENVIRONMENT: 'DEV' | 'PROD' = 'DEV';
+// 'PROD' points to production; anything else to the MeetingLawyers demo environment.
+export const ML_ENVIRONMENT: 'DEV' | 'PROD' = import.meta.env.ML_ENVIRONMENT === 'PROD' ? 'PROD' : 'DEV';
 
 // Optional theme applied after configure(). Colors are '#RRGGBB' or '#RRGGBBAA'.
 // Every field is optional; each platform applies the colors its SDK supports.

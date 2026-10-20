@@ -8,7 +8,8 @@ import java.util.Locale
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        MeetingLawyersSDK(this, Constants.apiKey, CustomerSdkBuildMode.DEV, Locale.getDefault())
+        val buildMode = if (Constants.isProduction) CustomerSdkBuildMode.PROD else CustomerSdkBuildMode.DEV
+        MeetingLawyersSDK(this, Constants.apiKey, buildMode, Locale.getDefault())
             .build()
     }
 }

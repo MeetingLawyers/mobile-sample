@@ -28,7 +28,7 @@ extension ViewController {
     private func launchSdk() {
         Task {
             do {
-                let configuration = MeetingLawyersConfiguration(apiKey: Constants.apiKey, environment: RemoteEnvironment.development, logType: .debug)
+                let configuration = MeetingLawyersConfiguration(apiKey: Constants.apiKey, environment: Constants.isProduction ? .production : .development, logType: .debug)
                 try await MeetingLawyersApp.configure(configuration)
                 self.configStyle()
                 try await MeetingLawyersApp.authenticate(userId: Constants.userId)

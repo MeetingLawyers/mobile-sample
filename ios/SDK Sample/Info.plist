@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>MLApiKey</key>
+	<string>$(ML_API_KEY)</string>
+	<key>MLEnvironment</key>
+	<string>$(ML_ENVIRONMENT)</string>
+	<key>MLUserId</key>
+	<string>$(ML_USER_ID)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

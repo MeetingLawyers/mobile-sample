@@ -12,6 +12,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D1E2F3A4B5C6D7E8F9A0B1C2 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		8AEFC3D7289134B900BDADD9 /* SDK Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SDK Sample.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -45,6 +46,7 @@
 		8AEFC3CE289134B900BDADD9 = {
 			isa = PBXGroup;
 			children = (
+				D1E2F3A4B5C6D7E8F9A0B1C2 /* Config.xcconfig */,
 				2B3C4D5E6F708192A3B4C5D6 /* SDK Sample */,
 				8AEFC3D8289134B900BDADD9 /* Products */,
 			);
@@ -145,6 +147,7 @@
 /* Begin XCBuildConfiguration section */
 		8AEFC3E9289134B900BDADD9 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D1E2F3A4B5C6D7E8F9A0B1C2 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -206,6 +209,7 @@
 		};
 		8AEFC3EA289134B900BDADD9 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D1E2F3A4B5C6D7E8F9A0B1C2 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
