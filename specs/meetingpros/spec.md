@@ -166,6 +166,6 @@ available.
 
 | Sample | Where |
 |---|---|
-| `meetingpros/ios/` | — |
+| `meetingpros/ios/` | `MeetingProsIntegration.swift`, called from the home screen |
 | `meetingpros/android/` | — |
 | `meetingpros/capacitor/` | — |

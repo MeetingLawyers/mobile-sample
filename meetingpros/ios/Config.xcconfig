@@ -1,0 +1,2 @@
+// Demo credentials come from the repo-root .env (git-ignored), see ../../.env.example.
+#include? "../../.env"
