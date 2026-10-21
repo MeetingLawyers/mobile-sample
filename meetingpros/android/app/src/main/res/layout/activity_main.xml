@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/app_name"
+            android:textAppearance="?attr/textAppearanceTitleLarge" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+        <TextView
+            android:id="@+id/message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="?attr/colorError"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/sign_in"
+            style="@style/SampleButton"
+            android:text="@string/sign_in" />
+
+        <LinearLayout
+            android:id="@+id/lists"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <EditText
+            android:id="@+id/professional_hash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:autofillHints=""
+            android:hint="@string/professional_hash"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/open_chat"
+            style="@style/SampleButton"
+            android:text="@string/open_chat" />
+
+        <LinearLayout
+            android:id="@+id/features"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <Button
+            android:id="@+id/log_out"
+            style="@style/SampleButton"
+            android:text="@string/log_out" />
+    </LinearLayout>
+</ScrollView>

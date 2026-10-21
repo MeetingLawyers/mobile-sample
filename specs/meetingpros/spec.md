@@ -161,11 +161,14 @@ available.
 - The vets filter uses each SDK's own speciality identifiers: numeric ids on iOS, `SpecialityInfo` values
   on Android. Both lists cover the same veterinary specialities.
 - Video call needs an extra dependency on Android (`videocall-sdk`).
+- Android has no availability check of its own for appointments: it is available when booking is.
+- Each SDK reports "My health" availability its own way, so the same company can show it on one platform
+  and not on the other.
 
 ## Shown in
 
 | Sample | Where |
 |---|---|
 | `meetingpros/ios/` | `MeetingProsIntegration.swift`, called from the home screen |
-| `meetingpros/android/` | — |
+| `meetingpros/android/` | `MeetingProsIntegration.kt`, called from `App` and the home screen |
 | `meetingpros/capacitor/` | — |
