@@ -18,7 +18,7 @@ Each folder is a self-contained project with its own README.
 
 ## SDK versions
 
-`master` always builds against the versions below. Every SDK bump updates all the samples in one change
+`main` always builds against the versions below. Every SDK bump updates all the samples in one change
 and is published as a [release](../../releases).
 
 | Sample | MeetingLawyers SDK | Requirements |

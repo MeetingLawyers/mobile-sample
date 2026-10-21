@@ -2,7 +2,7 @@ name: Capacitor
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths: ['capacitor/**', '.github/workflows/capacitor.yml']
   pull_request:
     paths: ['capacitor/**', '.github/workflows/capacitor.yml']
