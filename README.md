@@ -14,7 +14,8 @@ Check the full documentation at
 | [`android/`](android/) | Android (Kotlin) | Native integration of the MeetingLawyers Android SDK |
 | [`capacitor/`](capacitor/) | Ionic + Capacitor (iOS and Android) | A copy-paste wrapper (local Capacitor plugin) over both native SDKs |
 
-Each folder is a self-contained project with its own README.
+Each folder is a self-contained project. Its README starts with **Add it to your app**: the SDK
+dependency, the files to copy and the few lines that call them.
 
 ## SDK versions
 
