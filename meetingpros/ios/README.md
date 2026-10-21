@@ -5,41 +5,61 @@ Native iOS (Swift, UIKit) sample that integrates **lawyers** (MeetingLawyers SDK
 list, a lawyer's chat, the doctors features (video call, medical history, My health, booking,
 appointments), log out and receive the push notifications of both.
 
-Check the full documentation at
-[developer.meetinglawyers.com](https://developer.meetinglawyers.com/docs/getting-started).
+Full documentation: [developer.meetinglawyers.com](https://developer.meetinglawyers.com/docs/getting-started).
 
-## How the integration works
+## Add it to your app
 
-Copy [`MeetingProsIntegration.swift`](MeetingPros%20Sample/MeetingProsIntegration.swift) into your app and
-call it from your screens. It is the only file that imports `MeetingLawyers` and `MeetingDoctorsSDK`;
-everything else talks to it with plain Swift types.
+Both SDKs live behind one file you copy: the rest of your app never imports `MeetingLawyers` or
+`MeetingDoctorsSDK`. Ask for your MeetingPros API keys (lawyers and doctors) at
+[support@meetinglawyers.com](mailto:support@meetinglawyers.com).
 
-| File | Role |
-|------|------|
-| [`MeetingProsIntegration.swift`](MeetingPros%20Sample/MeetingProsIntegration.swift) | `configure`, `configureTheme`, `authenticate`, `openProfessionalList(.lawyers / .doctors / .vets)`, `openLawyerChat`, `availableFeatures`, `open(feature)`, `isAuthenticated`, `logout`, and the FCM / `UNUserNotificationCenter` delegates that route each push to its SDK |
-| [`AppDelegate.swift`](MeetingPros%20Sample/AppDelegate.swift) | Configures Firebase and hands push delivery to the integration on launch |
-| [`SceneDelegate.swift`](MeetingPros%20Sample/SceneDelegate.swift) | Hosts the app in a `UINavigationController`, so the SDK screens are pushed onto it |
-| [`ViewController.swift`](MeetingPros%20Sample/ViewController.swift) | The home screen: no SDK knowledge beyond calling the integration |
+**1. Add the SDKs** with Swift Package Manager (**File → Add Package Dependencies…**):
+
+| Package | Version | Product |
+|---|---|---|
+| `https://github.com/MeetingLawyers/ios-sdk-spm-meetinglawyers` | Exact `2.2.1` | `MeetingLawyers` |
+| `https://github.com/Meeting-Doctors/meetingdoctors-sdk-spm` | Exact `11.6.3` | `MeetingDoctorsSDKWrapper` |
+| `https://github.com/firebase/firebase-ios-sdk` (push) | Up to next major | `FirebaseMessaging` |
+
+**2. Copy one file** into your app:
+[`MeetingProsIntegration.swift`](MeetingPros%20Sample/MeetingProsIntegration.swift).
+
+**3. Hook it on launch**, in `application(_:didFinishLaunchingWithOptions:)`:
+
+```swift
+FirebaseApp.configure()
+MeetingProsIntegration.shared.startHandlingPushNotifications()
+```
+
+**4. Use it** from your screens. Every screen is pushed onto your navigation controller:
+
+```swift
+let integration = MeetingProsIntegration.shared
+try await integration.configure(lawyersApiKey: "<lawyers key>", doctorsApiKey: "<doctors key>", isProduction: false)
+integration.configureTheme(color: .systemTeal, logo: UIImage(named: "logo"))
+try await integration.authenticate(userId: "<user id>")       // both SDKs; also asks for push permission
+try integration.openProfessionalList(.doctors, in: navigationController)   // .lawyers, .doctors or .vets
+try await integration.openLawyerChat(professionalHash: hash, from: viewController)
+let features = await integration.availableFeatures()           // e.g. [.videoCall, .medicalHistory]
+try await integration.open(.medicalHistory, in: navigationController)
+try await integration.logout()                                  // both SDKs
+```
+
+With `isProduction: false` lawyers use the demo environment and doctors the staging one.
+
+**5. Push notifications.** In **Signing & Capabilities** add *Push Notifications* and *Background Modes →
+Remote notifications*, and add your `GoogleService-Info.plist`. The integration routes each push to its
+SDK; share your Firebase credentials with MeetingLawyers as described in the
+[push notifications guide](https://developer.meetinglawyers.com/docs/ios/firebase/).
 
 The contract it fulfils is in [`specs/meetingpros/`](../../specs/meetingpros/spec.md).
 
-## Install
+## Run this sample
 
-Both SDKs are distributed with Swift Package Manager:
-[`ios-sdk-spm-meetinglawyers`](https://github.com/MeetingLawyers/ios-sdk-spm-meetinglawyers) (product
-`MeetingLawyers`) and [`meetingdoctors-sdk-spm`](https://github.com/Meeting-Doctors/meetingdoctors-sdk-spm)
-(product `MeetingDoctorsSDKWrapper`).
-
-## Credentials
-
-Ask for MeetingPros demo credentials at [support@meetinglawyers.com](mailto:support@meetinglawyers.com), then
-fill in the repo-root `.env` (git-ignored) — see the [root README](../../README.md#credentials). Here
-`ML_API_KEY` is the MeetingPros company key, `MD_API_KEY` its MeetingDoctors key and `ML_USER_ID` a user of
-both. With `ML_ENVIRONMENT=DEV` lawyers use the demo environment and doctors the staging one.
-
-Run it signed (the default): unsigned builds cannot use the keychain and the SDKs lose their session.
-
-## Run it
-
-Select the `MeetingPros Sample` scheme and run it. **Sign in** → open a list → tap a professional to chat.
-The doctors features are enabled only when the company has them.
+1. Fill in the repo-root `.env` (git-ignored), see the [root README](../../README.md#credentials):
+   `ML_API_KEY` is the MeetingPros company key, `MD_API_KEY` its MeetingDoctors key and `ML_USER_ID` a user of
+   both.
+2. Open `MeetingPros Sample.xcodeproj` and run the `MeetingPros Sample` scheme. Run it signed (the default):
+   unsigned builds cannot use the keychain and the SDKs lose their session.
+3. **Sign in** → open a list → tap a professional to chat. The doctors features are enabled only when the
+   company has them.
