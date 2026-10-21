@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MeetingPros Sample</string>
+    <string name="status">Status: %1$s (%2$s)</string>
+    <string name="sign_in">Sign in</string>
+    <string name="professional_hash">Lawyer\'s professional hash</string>
+    <string name="open_chat">Open lawyer chat</string>
+    <string name="log_out">Log out</string>
+</resources>

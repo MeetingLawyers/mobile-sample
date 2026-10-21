@@ -23,7 +23,7 @@ updates:
         patterns: ['*']
 
   - package-ecosystem: gradle
-    directories: ['/android', '/capacitor/android']
+    directories: ['/android', '/capacitor/android', '/meetingpros/android']
     registries: [meetinglawyers-maven]
     schedule:
       interval: monthly

@@ -14,6 +14,7 @@ Check the full documentation at
 | [`android/`](android/) | Android (Kotlin) | Native integration of the MeetingLawyers Android SDK |
 | [`capacitor/`](capacitor/) | Ionic + Capacitor (iOS and Android) | A copy-paste wrapper (local Capacitor plugin) over both native SDKs |
 | [`meetingpros/ios/`](meetingpros/ios/) | iOS (Swift, UIKit) | MeetingPros: lawyers plus doctors and vets behind one copy-paste file |
+| [`meetingpros/android/`](meetingpros/android/) | Android (Kotlin) | MeetingPros: lawyers plus doctors and vets behind one copy-paste file |
 
 Each folder is a self-contained project. Its README starts with **Add it to your app**: the SDK
 dependency, the files to copy and the few lines that call them.
@@ -29,6 +30,7 @@ and is published as a [release](../../releases).
 | `android/` | Android 2.1.15 | Android Studio, JDK 17+, minSdk 23, compileSdk 36 |
 | `capacitor/` | iOS 2.2.1 · Android 2.1.15 | Node 22+, Capacitor 8, Xcode 26+, iOS 15+, minSdk 24 |
 | `meetingpros/ios/` | iOS 2.2.1 + MeetingDoctors 11.6.3 | Xcode 26+, iOS 15+ |
+| `meetingpros/android/` | Android 2.1.15 + MeetingDoctors chat 2.9.0, video call 3.0.22 | Android Studio, JDK 17+, minSdk 24, compileSdk 36 |
 
 ## Credentials
 
