@@ -38,10 +38,10 @@ final class MeetingLawyersIntegration: NSObject {
         MeetingLawyersApp.setStyle(navigationTitleView: logoView)
     }
 
-    /// Signs the user in and links this device's push token to them.
+    /// Signs the user in, then asks for push permission and links this device's token to them.
     func authenticate(userId: String) async throws {
         try await MeetingLawyersApp.authenticate(userId: userId)
-        await registerForPushNotifications()
+        Task { await registerForPushNotifications() }
     }
 
     var isAuthenticated: Bool {

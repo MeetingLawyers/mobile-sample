@@ -360,7 +360,7 @@
 			repositoryURL = "https://github.com/MeetingLawyers/ios-sdk-spm-meetinglawyers";
 			requirement = {
 				kind = exactVersion;
-				version = 2.1.2;
+				version = 2.2.1;
 			};
 		};
 		C3DA7D4C2D00464F005D7D4E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {

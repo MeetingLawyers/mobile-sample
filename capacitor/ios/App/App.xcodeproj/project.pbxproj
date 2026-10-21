@@ -394,7 +394,7 @@
 			repositoryURL = "https://github.com/MeetingLawyers/ios-sdk-spm-meetinglawyers";
 			requirement = {
 				kind = exactVersion;
-				version = 2.1.2;
+				version = 2.2.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

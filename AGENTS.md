@@ -55,6 +55,9 @@ xcodebuild build -project "ios/SDK Sample.xcodeproj" -scheme "SDK Sample" \
 (cd capacitor && npm ci && npm run lint && npm run build && npx vitest run)
 ```
 
+`CODE_SIGNING_ALLOWED=NO` is only for compile checks. To run an iOS sample, build it signed (the
+default): unsigned apps cannot use the keychain, so the SDK loses its configuration and session.
+
 ## Conventions
 
 - KISS: a sample shows the integration, nothing else. No architecture layers, no extra libraries.

@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/MeetingLawyers/ios-sdk-spm-meetinglawyers",
       "state" : {
-        "revision" : "a9e6c2c468c983b353cadc834b96445a75ca66e3",
-        "version" : "2.1.2"
+        "revision" : "10811c0485a5f482fb0f21e92e4abda2d67bca42",
+        "version" : "2.2.1"
       }
     },
     {

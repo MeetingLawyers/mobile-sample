@@ -23,9 +23,9 @@ and is published as a [release](../../releases).
 
 | Sample | MeetingLawyers SDK | Requirements |
 |---|---|---|
-| `ios/` | iOS 2.1.2 | Xcode 26+, iOS 15+ |
+| `ios/` | iOS 2.2.1 | Xcode 26+, iOS 15+ |
 | `android/` | Android 2.1.15 | Android Studio, JDK 17+, minSdk 23, compileSdk 36 |
-| `capacitor/` | iOS 2.1.2 · Android 2.1.15 | Node 22+, Capacitor 8, Xcode 26+, iOS 15+, minSdk 24 |
+| `capacitor/` | iOS 2.2.1 · Android 2.1.15 | Node 22+, Capacitor 8, Xcode 26+, iOS 15+, minSdk 24 |
 
 ## Credentials
 
