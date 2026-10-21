@@ -13,6 +13,7 @@ Check the full documentation at
 | [`ios/`](ios/) | iOS (Swift, UIKit) | Native integration of the MeetingLawyers iOS SDK (Swift Package) |
 | [`android/`](android/) | Android (Kotlin) | Native integration of the MeetingLawyers Android SDK |
 | [`capacitor/`](capacitor/) | Ionic + Capacitor (iOS and Android) | A copy-paste wrapper (local Capacitor plugin) over both native SDKs |
+| [`meetingpros/ios/`](meetingpros/ios/) | iOS (Swift, UIKit) | MeetingPros: lawyers plus doctors and vets behind one copy-paste file |
 
 Each folder is a self-contained project. Its README starts with **Add it to your app**: the SDK
 dependency, the files to copy and the few lines that call them.
@@ -22,11 +23,12 @@ dependency, the files to copy and the few lines that call them.
 `main` always builds against the versions below. Every SDK bump updates all the samples in one change
 and is published as a [release](../../releases).
 
-| Sample | MeetingLawyers SDK | Requirements |
+| Sample | SDKs | Requirements |
 |---|---|---|
 | `ios/` | iOS 2.2.1 | Xcode 26+, iOS 15+ |
 | `android/` | Android 2.1.15 | Android Studio, JDK 17+, minSdk 23, compileSdk 36 |
 | `capacitor/` | iOS 2.2.1 · Android 2.1.15 | Node 22+, Capacitor 8, Xcode 26+, iOS 15+, minSdk 24 |
+| `meetingpros/ios/` | iOS 2.2.1 + MeetingDoctors 11.6.3 | Xcode 26+, iOS 15+ |
 
 ## Credentials
 
@@ -45,7 +47,8 @@ cp .env.example .env
 | `MD_API_KEY` | MeetingPros samples | Your MeetingDoctors API key |
 | `GPR_USER` / `GPR_TOKEN` | Android builds | GitHub user and a token with `read:packages`: the Android SDK is served from GitHub Packages |
 
-Write plain `KEY=value` lines with no comments: the iOS projects read this file as an Xcode `.xcconfig`.
+With MeetingPros credentials (`ML_API_KEY` of a MeetingPros company plus its `MD_API_KEY`) one `.env`
+runs every sample. Write plain `KEY=value` lines with no comments: the iOS projects read this file as an Xcode `.xcconfig`.
 
 ## License
 

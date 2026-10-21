@@ -14,3 +14,7 @@ point of view. Every sample implements the same contract on its platform. Templa
 | Chat | [`chat/`](chat/spec.md) |
 | Push notifications | [`push/`](push/spec.md) |
 | Session | [`session/`](session/spec.md) |
+
+## MeetingPros wrapper
+
+Lawyers, doctors and vets behind one file per platform: [`meetingpros/`](meetingpros/spec.md).
