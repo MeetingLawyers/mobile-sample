@@ -7,31 +7,64 @@ authenticate a user, open the native professional list and chat with a professio
 Check the full documentation at
 [developer.meetinglawyers.com](https://developer.meetinglawyers.com/docs/getting-started).
 
-## How the integration works
+## Add it to your app
 
-All the SDK integration lives in a small **copy-paste wrapper** (a local Capacitor plugin), so the rest
-of the app has no direct dependency on the SDKs:
+All the SDK integration lives in a small **copy-paste wrapper** (a local Capacitor plugin), so the rest of
+your app never imports the SDKs. Ask for your API key and GitHub Packages access at
+[support@meetinglawyers.com](mailto:support@meetinglawyers.com).
+
+**1. Copy the wrapper:**
 
 | File | Role |
 |------|------|
 | [`src/plugins/meeting-lawyers/`](src/plugins/meeting-lawyers/definitions.ts) | TypeScript API (`configure`, `configureTheme`, `authenticate`, `openProfessionalList`, `openChatWithProfessional`, `registerForPushNotifications`, `isAuthenticated`, `logout`) |
-| [`ios/App/App/MeetingLawyersPlugin.swift`](ios/App/App/MeetingLawyersPlugin.swift) | iOS bridge to the `MeetingLawyers` SDK (Swift Package) — also the FCM `MessagingDelegate` / `UNUserNotificationCenterDelegate` |
-| [`ios/App/App/MyViewController.swift`](ios/App/App/MyViewController.swift) | iOS `CAPBridgeViewController` subclass that registers the plugin and hosts a navigation controller (so native screens are pushed, not presented) |
+| [`ios/App/App/MeetingLawyersPlugin.swift`](ios/App/App/MeetingLawyersPlugin.swift) | iOS bridge to the `MeetingLawyers` SDK, also the FCM / notification delegate |
+| [`ios/App/App/MyViewController.swift`](ios/App/App/MyViewController.swift) | `CAPBridgeViewController` subclass that registers the plugin and hosts a navigation controller, so native screens are pushed |
 | [`android/.../MeetingLawyersPlugin.java`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MeetingLawyersPlugin.java) | Android bridge to the `com.meetinglawyers:sdk` library |
-| [`android/.../MeetingLawyersFirebaseService.java`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MeetingLawyersFirebaseService.java) | Android FCM service that forwards messages and token refreshes to the SDK |
+| [`android/.../MeetingLawyersFirebaseService.java`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MeetingLawyersFirebaseService.java) | Forwards FCM messages and tokens. If your app has its own `FirebaseMessagingService`, forward `onMessageReceived` / `onNewToken` from it instead |
 
-To reuse it in your own Capacitor app, copy those pieces and register the plugin:
+**2. iOS.** Add with Swift Package Manager
+[`ios-sdk-spm-meetinglawyers`](https://github.com/MeetingLawyers/ios-sdk-spm-meetinglawyers) (exact `2.2.1`,
+product `MeetingLawyers`) and, for push, `firebase-ios-sdk` (product `FirebaseMessaging`). Set
+`MyViewController` as the bridge controller, embedded in a navigation controller (see `Main.storyboard`),
+and add your `GoogleService-Info.plist`.
 
-- **iOS**: register the plugin in your `CAPBridgeViewController` subclass
-  ([`MyViewController.swift`](ios/App/App/MyViewController.swift)) and add the
-  [`ios-sdk-spm-meetinglawyers`](https://github.com/MeetingLawyers/ios-sdk-spm-meetinglawyers) Swift Package.
-  For push, add `firebase-ios-sdk` (FirebaseMessaging) and your `GoogleService-Info.plist`.
-- **Android**: register the plugin in [`MainActivity`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MainActivity.java)
-  and add the maven repository + dependency (see below). For push, register `MeetingLawyersFirebaseService`
-  in the manifest and add your `google-services.json` — or, if your app already has its own
-  `FirebaseMessagingService`, just forward `onMessageReceived` / `onNewToken` to the SDK from it.
+**3. Android.** Add the GitHub Packages repository (it needs a GitHub user and a token with
+`read:packages`) to `android/build.gradle`:
 
-Everything else in the app (UI, routing) has no dependency on the SDKs — see [`src/pages/Home.tsx`](src/pages/Home.tsx).
+```groovy
+allprojects {
+    repositories {
+        maven {
+            url "https://maven.pkg.github.com/MeetingLawyers/android-sdk-chat/"
+            credentials {
+                username = findProperty('GPR_USER') ?: System.getenv('GPR_USER')
+                password = findProperty('GPR_TOKEN') ?: System.getenv('GPR_TOKEN')
+            }
+        }
+    }
+}
+```
+
+Then the dependencies to `android/app/build.gradle`, plus the `google-services` and
+`firebase-crashlytics` plugins (the SDK brings Crashlytics, so its plugin is required):
+
+```groovy
+implementation "com.meetinglawyers:sdk:2.1.15"
+implementation platform("com.google.firebase:firebase-bom:32.7.1")
+implementation "com.google.firebase:firebase-messaging"
+```
+
+Register the plugin in [`MainActivity`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MainActivity.java)
+(`registerPlugin(MeetingLawyersPlugin.class)` before `super.onCreate`), declare
+`MeetingLawyersFirebaseService` in the manifest and add your `google-services.json`.
+
+**4. Push.** Share your Firebase credentials with MeetingLawyers as described in the push guides for
+[iOS](https://developer.meetinglawyers.com/docs/ios/firebase/) and
+[Android](https://developer.meetinglawyers.com/docs/android/push-notifications/).
+
+Everything else in the app (UI, routing) has no dependency on the SDKs: see [`src/pages/Home.tsx`](src/pages/Home.tsx).
+The contract the wrapper fulfils is in [`specs/`](../specs/).
 
 ## Usage
 

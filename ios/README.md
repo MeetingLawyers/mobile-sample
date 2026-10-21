@@ -3,44 +3,59 @@
 Native iOS (Swift, UIKit) sample that configures the MeetingLawyers SDK, authenticates a user, opens the
 professional list or a chat, logs out and receives push notifications over FCM.
 
-Check the full documentation at
-[developer.meetinglawyers.com](https://developer.meetinglawyers.com/docs/getting-started).
+Full documentation: [developer.meetinglawyers.com](https://developer.meetinglawyers.com/docs/getting-started).
 
-## How the integration works
+## Add it to your app
 
-Every SDK call lives in one file you can copy into your app:
+Every SDK call lives in one file you copy. Ask for your API key at
+[support@meetinglawyers.com](mailto:support@meetinglawyers.com).
 
-| File | Role |
-|------|------|
-| [`MeetingLawyersIntegration.swift`](SDK%20Sample/MeetingLawyersIntegration.swift) | `configure`, `configureTheme`, `authenticate`, `openProfessionalList`, `openChat`, `isAuthenticated`, `logout`, and the FCM / `UNUserNotificationCenter` delegates |
-| [`AppDelegate.swift`](SDK%20Sample/AppDelegate.swift) | Configures Firebase and hands push delivery to the integration on launch |
-| [`SceneDelegate.swift`](SDK%20Sample/SceneDelegate.swift) | Hosts the app in a `UINavigationController`, so the SDK screens are pushed onto it |
-| [`ViewController.swift`](SDK%20Sample/ViewController.swift) | The home screen: no SDK knowledge beyond calling the integration |
+**1. Add the SDK** with Swift Package Manager (**File → Add Package Dependencies…**):
+
+| Package | Version | Product |
+|---|---|---|
+| `https://github.com/MeetingLawyers/ios-sdk-spm-meetinglawyers` | Exact `2.2.1` | `MeetingLawyers` |
+| `https://github.com/firebase/firebase-ios-sdk` (push) | Up to next major | `FirebaseMessaging` |
+
+**2. Copy one file** into your app:
+[`MeetingLawyersIntegration.swift`](SDK%20Sample/MeetingLawyersIntegration.swift). It is the only file that
+imports `MeetingLawyers`: `configure`, `configureTheme`, `authenticate`, `openProfessionalList`, `openChat`,
+`isAuthenticated`, `logout`, and the push delegates.
+
+**3. Hook it on launch**, in `application(_:didFinishLaunchingWithOptions:)`:
+
+```swift
+FirebaseApp.configure()
+MeetingLawyersIntegration.shared.startHandlingPushNotifications()
+```
+
+**4. Use it** from your screens. The list is pushed onto your navigation controller:
+
+```swift
+let integration = MeetingLawyersIntegration.shared
+try await integration.configure(apiKey: "<your API key>", isProduction: false)
+integration.configureTheme(color: .systemTeal, logo: UIImage(named: "logo"))
+try await integration.authenticate(userId: "<user id>")   // also asks for push permission
+try integration.openProfessionalList(in: navigationController)
+try await integration.openChat(professionalHash: hash, from: viewController)
+try await integration.logout()
+```
+
+**5. Push notifications.** In **Signing & Capabilities** add *Push Notifications* and *Background Modes →
+Remote notifications*, add your `GoogleService-Info.plist`, and share your Firebase credentials with
+MeetingLawyers as described in the [push notifications guide](https://developer.meetinglawyers.com/docs/ios/firebase/).
 
 The contract each call fulfils is in [`specs/`](../specs/).
 
-## Install
+## Run this sample
 
-The SDK is distributed with Swift Package Manager:
-[`ios-sdk-spm-meetinglawyers`](https://github.com/MeetingLawyers/ios-sdk-spm-meetinglawyers). Open
-`SDK Sample.xcodeproj`; if Xcode does not fetch the packages, use **File → Packages → Resolve Package
-Versions**.
+1. Fill in the repo-root `.env` (git-ignored), see the [root README](../README.md#credentials).
+   `Config.xcconfig` includes it and [`Constants.swift`](SDK%20Sample/Constants.swift) reads the values from
+   `Info.plist`; rebuild after changing it.
+2. Open `SDK Sample.xcodeproj` and run the `SDK Sample` scheme. Run it signed (the default): unsigned builds
+   cannot use the keychain and the SDK loses its configuration and session.
+3. **Sign in** → **Open professional list** → tap a professional to chat. You can also open a chat by
+   professional hash.
 
-## Credentials
-
-Ask for demo credentials at [support@meetinglawyers.com](mailto:support@meetinglawyers.com), then fill in
-the repo-root `.env` (git-ignored) — see the [root README](../README.md#credentials).
-
-`Config.xcconfig` includes that file, `Info.plist` exposes `ML_API_KEY`, `ML_USER_ID` and `ML_ENVIRONMENT`,
-and [`Constants.swift`](SDK%20Sample/Constants.swift) reads them. Rebuild after changing `.env`.
-
-## Push notifications
-
-The sample ships the Firebase client config of `com.meetinglawyers.sdk.sample` (`GoogleService-Info.plist`)
-and the `aps-environment` entitlement. Push needs a real device signed with a team that can use that bundle
-id; with your own app, bring your own Firebase config and bundle id.
-
-## Run it
-
-Select the `SDK Sample` scheme and run it. **Sign in** → **Open professional list** → tap a professional to
-chat. You can also open a chat directly by professional hash.
+Push needs a real device signed with a team that can use `com.meetinglawyers.sdk.sample`; with your own app,
+use your own bundle id and Firebase config.
