@@ -57,17 +57,28 @@ dependencies {
 | File | What it does |
 |------|------|
 | [`MeetingProsIntegration.kt`](app/src/main/java/com/meetinglawyers/meetingpros/sample/MeetingProsIntegration.kt) | Every SDK call: `configure`, `configureTheme`, `authenticate`, `openProfessionalList(LAWYERS / DOCTORS / VETS)`, `openLawyerChat`, `availableFeatures`, `open(feature)`, `isAuthenticated`, `logout`, and the push routing |
-| [`SampleMessagingService.kt`](app/src/main/java/com/meetinglawyers/meetingpros/sample/SampleMessagingService.kt) | Forwards FCM messages and tokens. If your app already has a `FirebaseMessagingService`, add its two calls to yours instead |
+| [`MeetingProsMessagingService.kt`](app/src/main/java/com/meetinglawyers/meetingpros/sample/MeetingProsMessagingService.kt) | Forwards FCM messages and tokens. If your app already has a `FirebaseMessagingService`, add its two calls to yours instead |
 
 Register the service in `AndroidManifest.xml`:
 
 ```xml
-<service android:name=".SampleMessagingService" android:exported="false">
+<service android:name=".MeetingProsMessagingService" android:exported="false">
     <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT" />
     </intent-filter>
 </service>
 ```
+
+Two template changes the MeetingDoctors SDK needs:
+
+- The app theme must descend from `Theme.MaterialComponents` (the `Theme.Material3` ones do).
+- MeetingDoctors declares `androidx.core.content.FileProvider`: remove your app's provider with the same class
+  from the manifest, or the manifest merge fails.
+
+The video call SDK merges extra permissions into your manifest, among them `READ_PHONE_STATE` and
+`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, and a required `android.hardware.camera` feature (Google Play hides
+the app from devices without a camera unless you override it with `android:required="false"` and
+`tools:replace="android:required"`).
 
 **3. Configure it on startup**, in your `Application.onCreate`. `MainActivity` is what opens when a doctors
 push is tapped:
@@ -80,7 +91,8 @@ MeetingProsIntegration.configure(
 MeetingProsIntegration.configureTheme(Color.parseColor("#2E7D6B"))
 ```
 
-With `isProduction = false` lawyers use the demo environment and doctors the staging one.
+With `isProduction = false` lawyers use the demo environment and doctors the staging one. `configure` blocks
+the main thread for a couple of seconds while both SDKs start; calling it again does nothing.
 
 **4. Use it** from a coroutine (for example `lifecycleScope.launch { … }`):
 
@@ -97,6 +109,10 @@ MeetingProsIntegration.logout()                                         // both 
 permission on Android 13+ after signing in (see [`MainActivity.kt`](app/src/main/java/com/meetinglawyers/meetingpros/sample/MainActivity.kt)),
 and share your Firebase credentials with MeetingLawyers as described in the
 [push notifications guide](https://developer.meetinglawyers.com/docs/android/push-notifications/).
+
+`onMessageReceived` returns `false` for the pushes that are not for the SDKs, so you can handle yours. The video
+call SDK cannot tell its pushes apart, though: it takes every data push that is not a lawyers or doctors chat
+one, so only notification-only pushes reach your code.
 
 The contract it fulfils is in [`specs/meetingpros/`](../../specs/meetingpros/spec.md).
 
