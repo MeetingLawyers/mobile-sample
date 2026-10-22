@@ -7,8 +7,9 @@ import com.google.firebase.messaging.RemoteMessage
 class MeetingProsMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        // Lawyers and doctors pushes go to their SDK.
-        MeetingProsIntegration.onMessageReceived(remoteMessage)
+        if (!MeetingProsIntegration.onMessageReceived(remoteMessage)) {
+            // Your own pushes: only notification-only ones get here, data pushes go to the video call SDK.
+        }
     }
 
     override fun onNewToken(token: String) {
