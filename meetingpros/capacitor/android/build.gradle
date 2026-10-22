@@ -1,0 +1,56 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.13.0'
+        classpath 'com.google.gms:google-services:4.4.4'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+apply from: "variables.gradle"
+
+// Credentials live in the repo-root .env (git-ignored), see ../../../.env.example.
+def dotEnv = [:]
+def dotEnvFile = file('../../../.env')
+if (dotEnvFile.exists()) {
+    dotEnvFile.eachLine { line ->
+        def parts = line.split('=', 2)
+        if (parts.size() == 2 && !parts[0].trim().startsWith('#')) {
+            dotEnv[parts[0].trim()] = parts[1].trim()
+        }
+    }
+}
+def credential = { String key -> dotEnv[key] ?: findProperty(key) ?: System.getenv(key) ?: '' }
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        // MeetingDoctors SDKs (public)
+        maven { url "https://storage.googleapis.com/production-mobile-sdks/android/" }
+        // MeetingLawyers SDK (GitHub Packages)
+        maven {
+            url "https://maven.pkg.github.com/MeetingLawyers/android-sdk-chat/"
+            credentials {
+                // GitHub Packages requires credentials even for public consumers:
+                // .env first, then ~/.gradle/gradle.properties, then environment variables.
+                username = credential('GPR_USER')
+                password = credential('GPR_TOKEN')
+            }
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

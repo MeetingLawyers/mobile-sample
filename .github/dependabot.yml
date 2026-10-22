@@ -15,7 +15,7 @@ updates:
       interval: monthly
 
   - package-ecosystem: npm
-    directory: /capacitor
+    directories: ['/capacitor', '/meetingpros/capacitor']
     schedule:
       interval: monthly
     groups:
@@ -23,7 +23,7 @@ updates:
         patterns: ['*']
 
   - package-ecosystem: gradle
-    directories: ['/android', '/capacitor/android', '/meetingpros/android']
+    directories: ['/android', '/capacitor/android', '/meetingpros/android', '/meetingpros/capacitor/android']
     registries: [meetinglawyers-maven]
     schedule:
       interval: monthly
