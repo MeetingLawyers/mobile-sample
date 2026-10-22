@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
         android:label="MP Sample"
+        android:theme="@style/NormalTheme"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:name="${applicationName}"
