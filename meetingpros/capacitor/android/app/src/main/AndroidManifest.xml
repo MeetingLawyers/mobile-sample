@@ -25,7 +25,7 @@
         </activity>
 
         <service
-            android:name=".MeetingProsFirebaseService"
+            android:name=".MeetingProsMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

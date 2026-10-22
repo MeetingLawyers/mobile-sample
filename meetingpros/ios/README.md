@@ -19,7 +19,7 @@ Both SDKs live behind one file you copy: the rest of your app never imports `Mee
 |---|---|---|
 | `https://github.com/MeetingLawyers/ios-sdk-spm-meetinglawyers` | Exact `2.2.1` | `MeetingLawyers` |
 | `https://github.com/Meeting-Doctors/meetingdoctors-sdk-spm` | Exact `11.6.3` | `MeetingDoctorsSDKWrapper` |
-| `https://github.com/firebase/firebase-ios-sdk` (push) | Up to next major | `FirebaseMessaging` |
+| `https://github.com/firebase/firebase-ios-sdk` (push) | Exact `12.15.0` | `FirebaseMessaging` |
 
 **2. Copy one file** into your app:
 [`MeetingProsIntegration.swift`](MeetingPros%20Sample/MeetingProsIntegration.swift).
@@ -30,6 +30,9 @@ Both SDKs live behind one file you copy: the rest of your app never imports `Mee
 FirebaseApp.configure()
 MeetingProsIntegration.shared.startHandlingPushNotifications()
 ```
+
+This makes the integration the `UNUserNotificationCenter.delegate`: route your own notifications through it, or
+forward the ones it does not own from your delegate.
 
 **4. Use it** from your screens. Every screen is pushed onto your navigation controller:
 
@@ -45,12 +48,14 @@ try await integration.open(.medicalHistory, in: navigationController)
 try await integration.logout()                                  // both SDKs
 ```
 
-With `isProduction: false` lawyers use the demo environment and doctors the staging one.
+With `isProduction: false` lawyers use the demo environment and doctors the staging one. Call `configure` as
+early as possible (calling it again does nothing): a push tapped before it finishes only opens the app.
 
-**5. Push notifications.** In **Signing & Capabilities** add *Push Notifications* and *Background Modes →
-Remote notifications*, and add your `GoogleService-Info.plist`. The integration routes each push to its
-SDK; share your Firebase credentials with MeetingLawyers as described in the
-[push notifications guide](https://developer.meetinglawyers.com/docs/ios/firebase/).
+**5. Permissions and push.** Add `NSCameraUsageDescription` (photos in the chat) and
+`NSMicrophoneUsageDescription` (audio messages and video calls) to your `Info.plist`. In **Signing &
+Capabilities** add *Push Notifications* and *Background Modes → Remote notifications*, and add your
+`GoogleService-Info.plist`. The integration routes each push to its SDK; share your Firebase credentials with
+MeetingLawyers as described in the [push notifications guide](https://developer.meetinglawyers.com/docs/ios/firebase/).
 
 The contract it fulfils is in [`specs/meetingpros/`](../../specs/meetingpros/spec.md).
 

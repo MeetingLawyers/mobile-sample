@@ -22,18 +22,24 @@ keys (lawyers and doctors) and GitHub Packages access at
 | [`ios/App/App/MeetingProsPlugin.swift`](ios/App/App/MeetingProsPlugin.swift) + [`MeetingProsIntegration.swift`](ios/App/App/MeetingProsIntegration.swift) | iOS bridge and the file that owns both SDKs |
 | [`ios/App/App/MyViewController.swift`](ios/App/App/MyViewController.swift) | `CAPBridgeViewController` subclass that registers the plugin inside a navigation controller, so native screens are pushed |
 | [`android/.../MeetingProsPlugin.kt`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MeetingProsPlugin.kt) + [`MeetingProsIntegration.kt`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MeetingProsIntegration.kt) | Android bridge and the file that owns both SDKs |
-| [`android/.../MeetingProsFirebaseService.kt`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MeetingProsFirebaseService.kt) | Routes FCM messages and tokens to both SDKs |
+| [`android/.../MeetingProsMessagingService.kt`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MeetingProsMessagingService.kt) | Routes FCM messages and tokens to both SDKs |
 
 **2. iOS.** Add with Swift Package Manager `ios-sdk-spm-meetinglawyers` (exact `2.2.1`, product
 `MeetingLawyers`), `meetingdoctors-sdk-spm` (exact `11.6.3`, product `MeetingDoctorsSDKWrapper`) and
-`firebase-ios-sdk` (product `FirebaseMessaging`). Use `MyViewController` as the bridge controller, embedded in
-a navigation controller (see `Main.storyboard`), add your `GoogleService-Info.plist`, and in
-`AppDelegate.application(_:didFinishLaunchingWithOptions:)`:
+`firebase-ios-sdk` (exact `12.15.0`, product `FirebaseMessaging`). Use `MyViewController` as the bridge
+controller, embedded in a navigation controller (see `Main.storyboard`), add your `GoogleService-Info.plist`,
+and in `AppDelegate.application(_:didFinishLaunchingWithOptions:)`:
 
 ```swift
 FirebaseApp.configure()
 MeetingProsIntegration.shared.startHandlingPushNotifications()
 ```
+
+This makes the integration the `UNUserNotificationCenter.delegate`: route your own notifications through it, or
+forward the ones it does not own from your delegate. A push tapped before `configure` finishes only opens the app.
+Add `NSCameraUsageDescription` and `NSMicrophoneUsageDescription` to `Info.plist` (photos, audio messages and
+video calls), and in **Signing & Capabilities** add *Push Notifications* and *Background Modes → Remote
+notifications* (see [`App.entitlements`](ios/App/App/App.entitlements)).
 
 **3. Android.** The plugin is Kotlin, so apply `org.jetbrains.kotlin.android`. Add the MeetingDoctors
 repository (public) and the MeetingLawyers one (GitHub Packages, a token with `read:packages`) to
@@ -67,11 +73,17 @@ implementation "com.google.firebase:firebase-messaging"
 ```
 
 Register the plugin in [`MainActivity`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MainActivity.java)
-(`registerPlugin(MeetingProsPlugin.class)` before `super.onCreate`), declare `MeetingProsFirebaseService` in
+(`registerPlugin(MeetingProsPlugin.class)` before `super.onCreate`), declare `MeetingProsMessagingService` in
 the manifest and add your `google-services.json`. Two template changes the MeetingDoctors SDK needs:
 
 - The app theme must descend from `Theme.MaterialComponents` (see [`styles.xml`](android/app/src/main/res/values/styles.xml)).
 - Remove the template's `androidx.core.content.FileProvider` from the manifest: MeetingDoctors declares its own.
+
+`configure` blocks the main thread for a couple of seconds while both SDKs start; later calls (a web reload)
+do nothing. The plugin saves its arguments, so a push that wakes the killed app configures the SDKs before it
+is routed. The video call SDK takes every data push that is not a lawyers or doctors chat one: only
+notification-only pushes reach your own code (see the [Android README](../android/README.md)). It also merges
+extra permissions, listed there.
 
 **4. Use it** from your TypeScript:
 
