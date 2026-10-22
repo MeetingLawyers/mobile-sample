@@ -7,9 +7,8 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.meetinglawyers.sdk.MeetingLawyersSDK;
 
 /**
- * Forwards FCM messages and token refreshes to the MeetingLawyers SDK.
- * If your app already has its own FirebaseMessagingService, add these two
- * forwards to it instead of registering this one.
+ * Forwards FCM messages and token refreshes to the MeetingLawyers SDK, configuring it first when a push
+ * wakes the app. If your app already has its own FirebaseMessagingService, add these two forwards to it.
  */
 public class MeetingLawyersFirebaseService extends FirebaseMessagingService {
 
@@ -18,16 +17,17 @@ public class MeetingLawyersFirebaseService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
         String data = message.getData().get("data");
-        if (data != null && MeetingLawyersSDK.Companion.isInitialized()) {
+        if (data != null && MeetingLawyersPlugin.restoreConfiguration(getApplication())) {
             MeetingLawyersSDK.Companion.getClientInstance().onPushMessageReceived(data);
         }
     }
 
-    /** Keeps the SDK token registration up to date. */
+    /** Forwards token refreshes once a user is signed in. */
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
-        if (MeetingLawyersSDK.Companion.isInitialized()) {
+        if (MeetingLawyersPlugin.restoreConfiguration(getApplication())
+                && MeetingLawyersSDK.Companion.getClientInstance().isAuthenticated()) {
             MeetingLawyersSDK.Companion.getClientInstance().onNewTokenReceived(token);
         }
     }
