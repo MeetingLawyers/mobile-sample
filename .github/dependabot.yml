@@ -22,6 +22,11 @@ updates:
       npm:
         patterns: ['*']
 
+  - package-ecosystem: pub
+    directory: /meetingpros/flutter
+    schedule:
+      interval: monthly
+
   - package-ecosystem: gradle
     directories: ['/android', '/capacitor/android', '/meetingpros/android', '/meetingpros/capacitor/android']
     registries: [meetinglawyers-maven]

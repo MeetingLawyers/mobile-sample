@@ -1,0 +1,80 @@
+name: MeetingPros Flutter
+
+on:
+  push:
+    branches: [main]
+    paths: ['meetingpros/flutter/**', '.github/workflows/meetingpros-flutter.yml']
+  pull_request:
+    paths: ['meetingpros/flutter/**', '.github/workflows/meetingpros-flutter.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: meetingpros-flutter-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: meetingpros/flutter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+  android:
+    needs: dart
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # The SDK is served from GitHub Packages; secrets are not available on pull requests from forks.
+    env:
+      GPR_USER: ${{ secrets.GPR_USER }}
+      GPR_TOKEN: ${{ secrets.GPR_TOKEN }}
+    steps:
+      - name: Check GitHub Packages credentials
+        id: gpr
+        run: |
+          if [ -z "$GPR_TOKEN" ]; then
+            echo "::notice::GPR_TOKEN is not available (pull request from a fork?): skipping the Android build."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.gpr.outputs.skip != 'true'
+      - uses: actions/setup-java@v4
+        if: steps.gpr.outputs.skip != 'true'
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        if: steps.gpr.outputs.skip != 'true'
+        with:
+          channel: stable
+          cache: true
+      - name: Build
+        if: steps.gpr.outputs.skip != 'true'
+        working-directory: meetingpros/flutter
+        run: flutter build apk --debug
+
+  ios:
+    needs: dart
+    runs-on: macos-26
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: meetingpros/flutter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter build ios --simulator --debug
