@@ -190,4 +190,5 @@ available.
 |---|---|
 | `meetingpros/ios/` | `MeetingProsIntegration.swift`, called from the home screen |
 | `meetingpros/android/` | `MeetingProsIntegration.kt`, called from `App` and the home screen |
+| `meetingpros/flutter/` | `lib/meeting_pros/`, bridged by a method channel to the same `MeetingProsIntegration` files |
 | `meetingpros/capacitor/` | `src/plugins/meeting-pros/`, bridged to the same `MeetingProsIntegration` files |
