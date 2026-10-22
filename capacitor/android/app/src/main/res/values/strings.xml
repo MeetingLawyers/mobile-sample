@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">ml-ionic-sample</string>
-    <string name="title_activity_main">ml-ionic-sample</string>
+    <string name="app_name">ML Sample</string>
+    <string name="title_activity_main">ML Sample</string>
     <string name="package_name">com.meetinglawyers.sample.ionic</string>
     <string name="custom_url_scheme">com.meetinglawyers.sample.ionic</string>
 </resources>

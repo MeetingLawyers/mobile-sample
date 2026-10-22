@@ -42,7 +42,7 @@ The wrapper MUST reject the call when the API key is missing or empty.
 |---|---|
 | Empty or missing API key | Rejected: `apiKey is required` |
 | The SDK fails to initialize | Rejected: `Configure failed: <reason>` |
-| Any other call before configure | Not supported. Android rejects it with `SDK not configured. Call configure() first.` |
+| Any other call before configure | Not supported. Capacitor Android rejects it with `SDK not configured. Call configure() first.`; native `android/` throws |
 
 ## Shown in
 

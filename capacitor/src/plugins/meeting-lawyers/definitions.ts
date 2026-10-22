@@ -47,9 +47,10 @@ export interface ThemeOptions {
  * Native counterparts:
  * - iOS:     ios/App/App/MeetingLawyersPlugin.swift
  * - Android: android/app/src/main/java/com/meetinglawyers/sample/ionic/MeetingLawyersPlugin.java
+ *            and MeetingLawyersFirebaseService.java (push)
  *
- * The three files (plus this folder) are self-contained: copy them into your
- * own Capacitor project to integrate the SDK without spreading native imports.
+ * Copy those three native files plus this folder into your own Capacitor project
+ * to integrate the SDK without spreading native imports.
  */
 export interface MeetingLawyersPlugin {
   /** Initializes the SDK. Call once at app startup, before any other method. */
@@ -64,9 +65,7 @@ export interface MeetingLawyersPlugin {
   openChatWithProfessional(options: OpenChatOptions): Promise<void>;
   /**
    * Asks for notification permission and registers the device FCM token with
-   * the SDK. Requires the platform Firebase config file (GoogleService-Info.plist /
-   * google-services.json); call it after authenticate() so the token is linked
-   * to the user.
+   * the SDK. Call it right after authenticate() so the token is linked to the user.
    */
   registerForPushNotifications(): Promise<void>;
   /** Whether a user is currently authenticated in the SDK. */

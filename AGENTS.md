@@ -3,7 +3,7 @@
 Single source of truth for AI assistants and humans. `CLAUDE.md` is a symlink to this file.
 
 This repo is **public**. It holds the integration samples of the MeetingLawyers SDKs: one
-self-contained project per folder (`ios/`, `android/`, `capacitor/`, and later `meetingpros/…`).
+self-contained project per folder (`ios/`, `android/`, `capacitor/` and `meetingpros/…`).
 Integrators copy the wrapper classes into their own app, so the code must stay small, readable and
 free of anything internal.
 

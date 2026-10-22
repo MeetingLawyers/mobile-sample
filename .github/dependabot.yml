@@ -27,6 +27,9 @@ updates:
     registries: [meetinglawyers-maven]
     schedule:
       interval: monthly
+    # The Firebase BoM must match the one the MeetingLawyers SDK is built against.
+    ignore:
+      - dependency-name: com.google.firebase:firebase-bom
     groups:
       gradle:
         patterns: ['*']

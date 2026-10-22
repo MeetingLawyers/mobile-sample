@@ -24,6 +24,7 @@ be called after authenticate, so the token is linked to the user.
 #### Scenario: token refresh
 
 - WHEN FCM issues a new token
+- AND a user is signed in
 - THEN it is forwarded to the SDK
 
 ### Requirement: only MeetingLawyers pushes go to the SDK
@@ -50,14 +51,14 @@ The wrapper MUST hand MeetingLawyers pushes to the SDK and MUST leave every othe
 
 | Situation | Result |
 |---|---|
-| Firebase config file missing | Rejected: `Firebase is not configured. …` |
-| Firebase not linked (iOS) | Rejected: `FirebaseMessaging is not linked. …` |
-| Token cannot be fetched (Android) | Rejected: `Could not fetch the FCM token` |
+| Token cannot be fetched | Rejected: `Could not fetch the FCM token` |
+
+The native samples ignore push errors: registration runs in the background after authenticate.
 
 ## Shown in
 
 | Sample | Where |
 |---|---|
 | `ios/` | `MeetingLawyersIntegration` push extension: delegates set on launch, token sent after authenticate |
-| `android/` | `SampleMessagingService.kt` + `MeetingLawyersIntegration`: token sent after authenticate, permission asked on Android 13+ |
-| `capacitor/` | `Home.tsx`, right before opening the list |
+| `android/` | `MeetingLawyersMessagingService.kt` + `MeetingLawyersIntegration`: token sent after authenticate, permission asked on Android 13+ |
+| `capacitor/` | `Home.tsx`, right after authenticate; delegates set in `AppDelegate` (iOS), SDK configured from saved values when a push wakes the app (Android) |

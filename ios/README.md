@@ -27,13 +27,16 @@ imports `MeetingLawyers`: `configure`, `configureTheme`, `authenticate`, `openPr
 ```swift
 FirebaseApp.configure()
 MeetingLawyersIntegration.shared.startHandlingPushNotifications()
+Task { try await MeetingLawyersIntegration.shared.configure(apiKey: "<your API key>", isProduction: false) }
 ```
+
+Configure as early as possible, so a push tapped on a cold start finds the SDK ready (this sample does it
+when its home screen loads, to show the status).
 
 **4. Use it** from your screens. The list is pushed onto your navigation controller:
 
 ```swift
 let integration = MeetingLawyersIntegration.shared
-try await integration.configure(apiKey: "<your API key>", isProduction: false)
 integration.configureTheme(color: .systemTeal, logo: UIImage(named: "logo"))
 try await integration.authenticate(userId: "<user id>")   // also asks for push permission
 try integration.openProfessionalList(in: navigationController)
@@ -41,9 +44,11 @@ try await integration.openChat(professionalHash: hash, from: viewController)
 try await integration.logout()
 ```
 
-**5. Push notifications.** In **Signing & Capabilities** add *Push Notifications* and *Background Modes →
-Remote notifications*, add your `GoogleService-Info.plist`, and share your Firebase credentials with
-MeetingLawyers as described in the [push notifications guide](https://developer.meetinglawyers.com/docs/ios/firebase/).
+**5. Permissions and push.** Add `NSCameraUsageDescription` and `NSMicrophoneUsageDescription` to your
+`Info.plist` (the chat sends photos and audio messages). In **Signing & Capabilities** add *Push
+Notifications* and *Background Modes → Remote notifications*, add your `GoogleService-Info.plist`, and share
+your Firebase credentials with MeetingLawyers as described in the
+[push notifications guide](https://developer.meetinglawyers.com/docs/ios/firebase/).
 
 The contract each call fulfils is in [`specs/`](../specs/).
 

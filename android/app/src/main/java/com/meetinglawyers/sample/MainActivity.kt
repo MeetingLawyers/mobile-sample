@@ -62,12 +62,10 @@ class MainActivity : AppCompatActivity() {
     private fun signIn() {
         show(null)
         integration.authenticate(Constants.userId) { error ->
-            runOnUiThread {
-                show(error)
-                if (error == null) {
-                    status = Status.AUTHENTICATED
-                    askNotificationPermission()
-                }
+            show(error)
+            if (error == null) {
+                status = Status.AUTHENTICATED
+                askNotificationPermission()
             }
         }
     }
@@ -85,10 +83,8 @@ class MainActivity : AppCompatActivity() {
     private fun logOut() {
         show(null)
         integration.logout { error ->
-            runOnUiThread {
-                show(error)
-                if (error == null) status = Status.CONFIGURED
-            }
+            show(error)
+            if (error == null) status = Status.CONFIGURED
         }
     }
 

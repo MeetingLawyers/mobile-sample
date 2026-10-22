@@ -23,16 +23,34 @@ your app never imports the SDKs. Ask for your API key and GitHub Packages access
 | [`android/.../MeetingLawyersPlugin.java`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MeetingLawyersPlugin.java) | Android bridge to the `com.meetinglawyers:sdk` library |
 | [`android/.../MeetingLawyersFirebaseService.java`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MeetingLawyersFirebaseService.java) | Forwards FCM messages and tokens. If your app has its own `FirebaseMessagingService`, forward `onMessageReceived` / `onNewToken` from it instead |
 
+Change the `package` line of the copied `.java` files to your app's package.
+
 **2. iOS.** Add with Swift Package Manager
 [`ios-sdk-spm-meetinglawyers`](https://github.com/MeetingLawyers/ios-sdk-spm-meetinglawyers) (exact `2.2.1`,
-product `MeetingLawyers`) and, for push, `firebase-ios-sdk` (product `FirebaseMessaging`). Set
-`MyViewController` as the bridge controller, embedded in a navigation controller (see `Main.storyboard`),
-and add your `GoogleService-Info.plist`.
+product `MeetingLawyers`) and `firebase-ios-sdk` (product `FirebaseMessaging`). Set `MyViewController` as the
+bridge controller, embedded in a navigation controller (see `Main.storyboard`), and add your
+`GoogleService-Info.plist`. Add `NSCameraUsageDescription` and `NSMicrophoneUsageDescription` to `Info.plist`
+(the chat sends photos and audio messages), and in **Signing & Capabilities → Push Notifications + Background
+Modes → Remote notifications**. Then hook push on launch, in
+[`AppDelegate`](ios/App/App/AppDelegate.swift)'s `application(_:didFinishLaunchingWithOptions:)`:
 
-**3. Android.** Add the GitHub Packages repository (it needs a GitHub user and a token with
-`read:packages`) to `android/build.gradle`:
+```swift
+FirebaseApp.configure()
+MeetingLawyersPlugin.startHandlingPushNotifications()
+```
+
+**3. Android.** In `android/build.gradle`, add the Firebase Gradle plugins (the SDK brings Crashlytics, so
+its plugin is required) and the GitHub Packages repository (it needs a GitHub user and a token with
+`read:packages`):
 
 ```groovy
+buildscript {
+    dependencies {
+        classpath 'com.google.gms:google-services:4.4.4'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
+    }
+}
+
 allprojects {
     repositories {
         maven {
@@ -46,18 +64,32 @@ allprojects {
 }
 ```
 
-Then the dependencies to `android/app/build.gradle`, plus the `google-services` and
-`firebase-crashlytics` plugins (the SDK brings Crashlytics, so its plugin is required):
+Then, in `android/app/build.gradle`, the dependencies and the two plugins:
 
 ```groovy
 implementation "com.meetinglawyers:sdk:2.1.15"
 implementation platform("com.google.firebase:firebase-bom:32.7.1")
 implementation "com.google.firebase:firebase-messaging"
+
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 ```
 
 Register the plugin in [`MainActivity`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MainActivity.java)
-(`registerPlugin(MeetingLawyersPlugin.class)` before `super.onCreate`), declare
-`MeetingLawyersFirebaseService` in the manifest and add your `google-services.json`.
+(`registerPlugin(MeetingLawyersPlugin.class)` before `super.onCreate`), add your `google-services.json` and
+declare the service in `AndroidManifest.xml`:
+
+```xml
+<service android:name=".MeetingLawyersFirebaseService" android:exported="false">
+    <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+    </intent-filter>
+</service>
+```
+
+Keep the SDK session on the device: set `android:allowBackup="false"` and point `android:dataExtractionRules`
+to rules that exclude everything, like
+[`data_extraction_rules.xml`](android/app/src/main/res/xml/data_extraction_rules.xml).
 
 **4. Push.** Share your Firebase credentials with MeetingLawyers as described in the push guides for
 [iOS](https://developer.meetinglawyers.com/docs/ios/firebase/) and
@@ -84,8 +116,9 @@ await MeetingLawyers.configureTheme({
   outgoingMessageColor: '#2E7D6B',
 });
 
-// 3. Authenticate the user
+// 3. Authenticate the user, then register for push so the token is linked to them
 await MeetingLawyers.authenticate({ userId: ML_USER_ID });
+await MeetingLawyers.registerForPushNotifications();
 
 // 4. Open the native professional list (tapping a professional opens its chat)
 await MeetingLawyers.openProfessionalList();
@@ -148,33 +181,25 @@ You can also open a chat directly by professional hash from the home screen.
 
 ## Push notifications
 
-Push works over FCM on both platforms. The wrapper exposes one method:
+Push works over FCM on both platforms. `registerForPushNotifications()` asks for permission and sends the
+FCM token to the SDK; this sample calls it right after `authenticate()` (see `Home.tsx`). Token refreshes are
+forwarded only once a user is signed in.
 
-```ts
-// After authenticate(): asks for permission and registers the FCM token with the SDK
-await MeetingLawyers.registerForPushNotifications();
-```
+Message and token forwarding are wired natively:
 
-In this sample it is called right before `openProfessionalList()` (see `Home.tsx`), so the user
-gets the permission prompt when entering the SDK flow instead of via a dedicated button.
-
-Message and token forwarding are already wired natively:
-
-- **iOS**: the plugin acts as `MessagingDelegate` + `UNUserNotificationCenterDelegate` and hands
-  MeetingLawyers pushes to the SDK (other pushes are shown normally).
+- **iOS**: `MeetingLawyersPlugin.startHandlingPushNotifications()`, called on launch, sets the
+  `MessagingDelegate` + `UNUserNotificationCenterDelegate` that hand MeetingLawyers pushes to the SDK (other
+  pushes are shown normally), so taps on a cold start reach the SDK too.
 - **Android**: [`MeetingLawyersFirebaseService`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MeetingLawyersFirebaseService.java)
   forwards FCM messages and token refreshes to the SDK. If your app already has its own
-  `FirebaseMessagingService`, add those two forwards to it instead.
+  `FirebaseMessagingService`, add those two forwards to it instead. `configure()` saves its values, so a push
+  that wakes a killed app configures the SDK before it is forwarded.
 
 This sample ships the Firebase client config for `com.meetinglawyers.sdk.sample`
-(`GoogleService-Info.plist` / `google-services.json`), so push works out of the box — Firebase client
-keys are not secrets. If you copy the wrapper into your own app, bring the config files of your own
-Firebase project instead.
+(`GoogleService-Info.plist` / `google-services.json`; Firebase client keys are not secrets). Push needs a real
+device signed with a team that can use that bundle id; with your own app, bring the config files of your own
+Firebase project.
 
-Two integration notes:
-
-- **Android**: the MeetingLawyers SDK pulls in Firebase Crashlytics, so once `google-services.json`
-  is present the `com.google.firebase.crashlytics` gradle plugin is required (already applied here) —
-  without it the app crashes on launch with "The Crashlytics build ID is missing".
-- If the Firebase config file is removed, the app still works; `registerForPushNotifications()`
-  just rejects with a clear message.
+The MeetingLawyers SDK pulls in Firebase Crashlytics, so on Android the `com.google.firebase.crashlytics`
+Gradle plugin is required (already applied here): without it the app crashes on launch with "The
+Crashlytics build ID is missing".
