@@ -45,6 +45,9 @@ supports, ignoring the rest.
 - THEN it is ignored
 - AND the call succeeds
 
+The native `ios/` and `android/` wrappers take one brand color and apply it to primary, secondary, navigation
+bar and outgoing message (iOS also takes a navigation bar logo).
+
 ## Errors
 
 | Situation | Result |

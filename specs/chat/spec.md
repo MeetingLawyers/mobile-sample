@@ -31,6 +31,8 @@ The wrapper MUST open the chat with the professional identified by the given has
 | Empty or missing hash | Rejected: `professionalHash is required` |
 | The SDK cannot open it | Rejected: `Could not open the chat: <reason>` |
 
+Native `android/` returns nothing: the SDK reports no errors when opening the chat.
+
 ## Shown in
 
 | Sample | Where |

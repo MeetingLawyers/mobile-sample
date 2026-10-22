@@ -38,6 +38,8 @@ SDK screens feel part of the app. When there is no navigation to push into, it M
 |---|---|
 | Called before configure / authenticate | Rejected: `Could not create the professional list. Call configure() and authenticate() first.` |
 
+Native `android/` returns nothing: the SDK reports no errors when opening the list.
+
 ## Shown in
 
 | Sample | Where |
