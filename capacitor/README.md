@@ -195,9 +195,9 @@ Message and token forwarding are wired natively:
   `FirebaseMessagingService`, add those two forwards to it instead. `configure()` saves its values, so a push
   that wakes a killed app configures the SDK before it is forwarded.
 
-This sample ships the Firebase client config for `com.meetinglawyers.sdk.sample`
-(`GoogleService-Info.plist` / `google-services.json`; Firebase client keys are not secrets). Push needs a real
-device signed with a team that can use that bundle id; with your own app, bring the config files of your own
+This sample ships the Firebase client config for `com.meetinglawyers.meetingpreview.dev` on iOS and
+`com.meetinglawyers.sdk.sample` on Android (`GoogleService-Info.plist` / `google-services.json`; Firebase client keys are not secrets). Push needs a real
+device signed with a team that can use those ids; with your own app, bring the config files of your own
 Firebase project.
 
 The MeetingLawyers SDK pulls in Firebase Crashlytics, so on Android the `com.google.firebase.crashlytics`

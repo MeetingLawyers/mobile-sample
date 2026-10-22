@@ -62,5 +62,5 @@ The contract each call fulfils is in [`specs/`](../specs/).
 3. **Sign in** → **Open professional list** → tap a professional to chat. You can also open a chat by
    professional hash.
 
-Push needs a real device signed with a team that can use `com.meetinglawyers.sdk.sample`; with your own app,
+Push needs a real device signed with a team that can use `com.meetinglawyers.meetingpreview.dev`; with your own app,
 use your own bundle id and Firebase config.
