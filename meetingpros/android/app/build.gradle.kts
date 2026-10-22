@@ -24,7 +24,6 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-
         listOf("ML_API_KEY", "MD_API_KEY", "ML_USER_ID", "ML_ENVIRONMENT").forEach { key ->
             buildConfigField("String", key, "\"${dotEnv[key].orEmpty()}\"")
         }
@@ -34,15 +33,6 @@ android {
         buildConfig = true
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -53,7 +43,6 @@ android {
 }
 
 dependencies {
-
     // sample dependencies
     implementation("com.meetinglawyers:sdk:2.1.15")
     implementation("com.meetingdoctors:customer-chat-sdk:2.9.0")
@@ -67,5 +56,4 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-
 }

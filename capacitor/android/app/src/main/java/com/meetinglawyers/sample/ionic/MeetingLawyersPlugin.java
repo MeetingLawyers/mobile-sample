@@ -1,6 +1,9 @@
 package com.meetinglawyers.sample.ionic;
 
 import android.Manifest;
+import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 
 import com.getcapacitor.JSObject;
@@ -11,7 +14,6 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.meetinglawyers.sdk.CustomerSdkBuildMode;
 import com.meetinglawyers.sdk.MeetingLawyersClient;
@@ -34,27 +36,51 @@ import java.util.function.Consumer;
 public class MeetingLawyersPlugin extends Plugin {
 
     static final String NOTIFICATIONS = "notifications";
+    private static final String PREFERENCES = "meetinglawyers_plugin";
+    private static final String API_KEY = "apiKey";
+    private static final String ENVIRONMENT = "environment";
 
     /** Initializes the SDK with the company API key and target environment. */
     @PluginMethod
     public void configure(PluginCall call) {
-        String apiKey = call.getString("apiKey");
+        String apiKey = call.getString(API_KEY);
         if (apiKey == null || apiKey.isEmpty()) {
             call.reject("apiKey is required");
             return;
         }
-        boolean isDevelopment = "DEV".equals(call.getString("environment"));
-        CustomerSdkBuildMode buildMode = isDevelopment ? CustomerSdkBuildMode.DEV : CustomerSdkBuildMode.PROD;
-        LogMode logMode = isDevelopment ? LogMode.VERBOSE : LogMode.NONE;
+        String environment = call.getString(ENVIRONMENT);
+        Application application = getActivity().getApplication();
         getActivity().runOnUiThread(() -> {
             try {
-                new MeetingLawyersSDK(getActivity().getApplication(), apiKey, buildMode, Locale.getDefault(), logMode)
-                        .build();
+                buildSdk(application, apiKey, environment);
+                preferences(application).edit().putString(API_KEY, apiKey).putString(ENVIRONMENT, environment).apply();
                 call.resolve();
             } catch (Exception e) {
                 call.reject("Configure failed: " + e.getMessage());
             }
         });
+    }
+
+    /** Configures the SDK with the last values passed to configure(), e.g. for a push that wakes the app. */
+    static synchronized boolean restoreConfiguration(Application application) {
+        String apiKey = preferences(application).getString(API_KEY, null);
+        if (!MeetingLawyersSDK.Companion.isInitialized() && apiKey != null) {
+            buildSdk(application, apiKey, preferences(application).getString(ENVIRONMENT, null));
+        }
+        return MeetingLawyersSDK.Companion.isInitialized();
+    }
+
+    /** Builds the SDK: demo environment with verbose logs for "DEV", production otherwise. */
+    private static synchronized void buildSdk(Application application, String apiKey, String environment) {
+        boolean isDevelopment = "DEV".equals(environment);
+        CustomerSdkBuildMode buildMode = isDevelopment ? CustomerSdkBuildMode.DEV : CustomerSdkBuildMode.PROD;
+        LogMode logMode = isDevelopment ? LogMode.VERBOSE : LogMode.NONE;
+        new MeetingLawyersSDK(application, apiKey, buildMode, Locale.getDefault(), logMode).build();
+    }
+
+    /** Where configure() keeps its values. */
+    private static SharedPreferences preferences(Context context) {
+        return context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
     }
 
     /** Applies the theme colors supported on Android; unsupported keys are ignored. */
@@ -179,10 +205,6 @@ public class MeetingLawyersPlugin extends Plugin {
 
     /** Fetches the current FCM token and hands it to the SDK. */
     private void registerPushToken(PluginCall call) {
-        if (FirebaseApp.getApps(getContext()).isEmpty()) {
-            call.reject("Firebase is not configured. Add google-services.json to android/app.");
-            return;
-        }
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
             if (!task.isSuccessful() || task.getResult() == null) {
                 call.reject("Could not fetch the FCM token", (Exception) task.getException());

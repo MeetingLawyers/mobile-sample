@@ -8,6 +8,10 @@
 	<string>$(ML_ENVIRONMENT)</string>
 	<key>MLUserId</key>
 	<string>$(ML_USER_ID)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Send photos to your professional in the chat.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Send audio messages in the chat.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

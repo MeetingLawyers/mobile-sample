@@ -30,7 +30,7 @@ either SDK.
 
 The wrapper MUST configure the MeetingLawyers SDK first and the MeetingDoctors SDK second, with one
 environment for both. On Android the order is mandatory: MeetingDoctors needs the MeetingLawyers
-installation.
+installation. Configuring again once configured MUST do nothing.
 
 | Environment | MeetingLawyers | MeetingDoctors |
 |---|---|---|
@@ -43,6 +43,11 @@ installation.
 - THEN the MeetingLawyers SDK targets its demo environment
 - AND the MeetingDoctors SDK targets its staging environment
 
+#### Scenario: configure twice
+
+- WHEN the integrator configures again (a web reload, an activity recreated)
+- THEN the call succeeds without configuring the SDKs again
+
 #### Scenario: configure without doctors API key
 
 - WHEN the integrator configures with an empty doctors API key
@@ -50,8 +55,8 @@ installation.
 
 ### Requirement: one theme for both SDKs
 
-The wrapper MUST apply the same palette to both SDKs: primary, secondary, navigation bar, incoming and
-outgoing message colors. Each SDK applies the colors it supports.
+The wrapper MUST take one brand color and apply it to both SDKs. Each SDK uses it for the elements it lets
+the app style (for example navigation bar, buttons, badges and outgoing messages).
 
 #### Scenario: apply the brand color
 
@@ -111,11 +116,19 @@ push to its SDK: MeetingLawyers first; if it is not a MeetingLawyers push, Meeti
 call on Android); anything else stays with the app. The FCM token MUST go to both SDKs, and only after
 authenticating.
 
+On Android the video call SDK cannot tell its pushes apart, so it takes every data push that is not a lawyers
+or doctors chat one: only notification-only pushes stay with the app.
+
 #### Scenario: doctors push
 
 - WHEN a MeetingDoctors push arrives
 - THEN the MeetingLawyers SDK ignores it
 - AND the MeetingDoctors SDK shows it or opens its chat when tapped
+
+#### Scenario: app push on Android
+
+- WHEN a push that is not for the SDKs arrives
+- THEN the wrapper reports it as not handled only when it has no data payload
 
 #### Scenario: token refresh
 
@@ -152,7 +165,12 @@ available.
 | Situation | Result |
 |---|---|
 | Empty or missing doctors API key | Rejected: `doctorsApiKey is required` |
+| Empty or missing lawyers API key (plugin) | Rejected: `lawyersApiKey is required` |
+| Empty or missing user id (plugin) | Rejected: `userId is required` |
+| Empty or missing professional hash (plugin) | Rejected: `professionalHash is required` |
+| Invalid brand color (plugin) | Rejected: `primaryColor must be #RRGGBB or #RRGGBBAA` |
 | Unknown list type | Rejected: `type must be lawyers, doctors or vets` |
+| Unknown feature (plugin) | Rejected: `Unknown feature` |
 | Feature not available for the company | Rejected: `<feature> is not available` |
 | Any MeetingLawyers error | As in the MeetingLawyers specs |
 
@@ -160,7 +178,8 @@ available.
 
 - The vets filter uses each SDK's own speciality identifiers: numeric ids on iOS, `SpecialityInfo` values
   on Android. Both lists cover the same veterinary specialities.
-- Video call needs an extra dependency on Android (`videocall-sdk`).
+- Video call needs an extra dependency on Android (`videocall-sdk`), and takes every data push that is not a
+  chat one (see "One push owner").
 - Android has no availability check of its own for appointments: it is available when booking is.
 - Each SDK reports "My health" availability its own way, so the same company can show it on one platform
   and not on the other.

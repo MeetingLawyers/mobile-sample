@@ -34,18 +34,25 @@ final class MeetingProsIntegration: NSObject {
     /// MeetingDoctors speciality ids of the vets list; doctors gets every other speciality.
     private static let vetSpecialities = ["62", "63", "71", "77", "80", "83", "84", "87", "101", "108", "111", "112"]
 
+    private var isConfigured = false
+
     /// Configures MeetingLawyers, then MeetingDoctors: production, or demo (lawyers) and staging (doctors).
+    /// Later calls do nothing.
     func configure(lawyersApiKey: String, doctorsApiKey: String, isProduction: Bool) async throws {
         guard !doctorsApiKey.isEmpty else { throw IntegrationError.doctorsApiKeyRequired }
+        guard !isConfigured else { return }
         try await MeetingLawyersApp.configure(MeetingLawyersConfiguration(
             apiKey: lawyersApiKey,
             environment: isProduction ? .production : .development,
             logType: isProduction ? .none : .debug
         ))
+        // Leaves crash reporting to your app.
+        MeetingDoctors.style.flags.common.sentryEnabled = false
         _ = try await MeetingDoctors.initialize(configuration: MeetingDoctors.Configuration(
             apikey: doctorsApiKey,
             environment: isProduction ? .production : .staging
         ))
+        isConfigured = true
     }
 
     /// Applies the brand color to both SDKs and shows the logo in the lawyers navigation bar.
@@ -82,12 +89,14 @@ final class MeetingProsIntegration: NSObject {
         MeetingLawyersApp.isAuthenticated() && MeetingDoctors.isAuthenticated
     }
 
-    /// Signs the user out of both SDKs.
+    /// Signs the user out of both SDKs, even when one fails, and rethrows the first error.
     func logout() async throws {
-        try await MeetingLawyersApp.logout()
+        var firstError: Error?
+        do { try await MeetingLawyersApp.logout() } catch { firstError = error }
         if MeetingDoctors.isAuthenticated {
-            try await MeetingDoctors.logout()
+            do { try await MeetingDoctors.logout() } catch { firstError = firstError ?? error }
         }
+        if let firstError { throw firstError }
     }
 
     /// Pushes the list of the given type onto the app's navigation; tapping a professional opens its chat.

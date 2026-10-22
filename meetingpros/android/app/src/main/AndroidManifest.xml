@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:name=".App"
@@ -10,8 +9,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AndroidSample"
-        tools:targetApi="31">
+        android:theme="@style/Theme.AndroidSample">
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -23,7 +21,7 @@
         </activity>
 
         <service
-            android:name=".SampleMessagingService"
+            android:name=".MeetingProsMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

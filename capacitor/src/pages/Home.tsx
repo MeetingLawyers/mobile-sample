@@ -30,7 +30,7 @@ const Home: React.FC = () => {
   }, []);
 
   const configureSdk = async () => {
-    if (!ML_API_KEY) {
+    if (!ML_API_KEY || !ML_USER_ID) {
       setStatus('missing-credentials');
       return;
     }
@@ -51,6 +51,8 @@ const Home: React.FC = () => {
       setError(null);
       await MeetingLawyers.authenticate({ userId: ML_USER_ID });
       setStatus('authenticated');
+      // Asks for push permission and links the token to the user; a push failure never blocks sign-in.
+      MeetingLawyers.registerForPushNotifications().catch(() => undefined);
     } catch (e) {
       setError(describe(e));
     }
@@ -59,9 +61,6 @@ const Home: React.FC = () => {
   const openProfessionalList = async () => {
     try {
       setError(null);
-      // Ask for the push permission right before entering the SDK flow;
-      // a push failure (e.g. missing Firebase config) never blocks the list.
-      await MeetingLawyers.registerForPushNotifications().catch(() => undefined);
       await MeetingLawyers.openProfessionalList();
     } catch (e) {
       setError(describe(e));
@@ -77,7 +76,7 @@ const Home: React.FC = () => {
     }
   };
 
-  const signOut = async () => {
+  const logOut = async () => {
     try {
       setError(null);
       await MeetingLawyers.logout();
@@ -100,7 +99,7 @@ const Home: React.FC = () => {
         </p>
         {status === 'missing-credentials' && (
           <IonNote color="warning">
-            Set ML_API_KEY and ML_USER_ID in the repo-root <code>.env</code>, then rebuild.
+            Fill in ML_API_KEY and ML_USER_ID in the repo-root <code>.env</code>, then rebuild.
           </IonNote>
         )}
         {error && (
@@ -154,12 +153,12 @@ const Home: React.FC = () => {
             expand="block"
             fill="clear"
             color="medium"
-            onClick={signOut}
+            onClick={logOut}
             disabled={status !== 'authenticated'}
-            data-testid="sign-out"
+            data-testid="log-out"
           >
             <IonIcon slot="start" icon={logOutOutline} />
-            Sign out
+            Log out
           </IonButton>
         </IonList>
       </IonContent>
@@ -175,9 +174,9 @@ const describeStatus = (status: SdkStatus): string => {
     case 'configuring':
       return 'Configuring…';
     case 'configured':
-      return 'Configured, not signed in';
+      return 'Configured';
     case 'authenticated':
-      return 'Signed in';
+      return 'Authenticated';
   }
 };
 

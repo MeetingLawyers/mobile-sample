@@ -2,7 +2,11 @@ package com.meetinglawyers.sample.ionic
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
+import android.content.Intent
+import android.util.Log
 import androidx.activity.addCallback
+import androidx.core.content.edit
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.RemoteMessage
@@ -41,11 +45,17 @@ object MeetingProsIntegration {
         SpecialityInfo.ATENCION_CLIENT_VETS, SpecialityInfo.ANESTESIA_ANALGESIA_VET,
         SpecialityInfo.ANTIBIOTERAPIA_VET, SpecialityInfo.DERMATOLOGIA_VET, SpecialityInfo.ENDOCRINO_VET,
         SpecialityInfo.CARDIOLOGIA_VET, SpecialityInfo.ENTRENADOR_CANINO, SpecialityInfo.OFTALMO_VET,
+        SpecialityInfo.EDUCADOR_CANINO,
     ).joinToString(",") { it.specialityName }
+
+    private const val USER_ID = "userId"
 
     private lateinit var application: Application
     private lateinit var pushActivity: Class<out Activity>
-    private var userId: String? = null
+
+    /** Keeps the signed-in user for the video call login across process restarts. */
+    private val preferences
+        get() = application.getSharedPreferences("meeting_pros", Context.MODE_PRIVATE)
 
     private val lawyers: MeetingLawyersClient
         get() = MeetingLawyersSDK.getClientInstance()
@@ -63,6 +73,7 @@ object MeetingProsIntegration {
     /**
      * Configures MeetingLawyers, then MeetingDoctors and its video call: production, or demo (lawyers) and
      * staging (doctors). Call it from `Application.onCreate`; `pushActivity` opens when a doctors push is tapped.
+     * It blocks the main thread for a couple of seconds; later calls do nothing.
      */
     fun configure(
         application: Application,
@@ -72,6 +83,7 @@ object MeetingProsIntegration {
         pushActivity: Class<out Activity>,
     ) {
         require(doctorsApiKey.isNotEmpty()) { "doctorsApiKey is required" }
+        if (isConfigured) return
         this.application = application
         this.pushActivity = pushActivity
         val logMode = if (isProduction) LogMode.NONE else LogMode.VERBOSE
@@ -85,11 +97,15 @@ object MeetingProsIntegration {
             application, doctorsApiKey, lawyers.getInstallationGuid(), false, lawyersApiKey,
             object : VideoCallClient.InitResponseListener {
                 override fun onInitSuccess() = Unit
-                override fun onInitFailure(message: String?) = Unit
+                override fun onInitFailure(message: String?) {
+                    Log.w("MeetingProsIntegration", "Video call init failed: $message")
+                }
             },
             if (isProduction) VideoCallBuildMode.PROD else VideoCallBuildMode.STAGING,
             Locale.getDefault(),
         )
+        // Ending a call brings `pushActivity` back to the front.
+        VideoCallClient.returnIntent = Intent(application, pushActivity).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
     }
 
     /** Applies the brand color to both SDKs. */
@@ -115,7 +131,7 @@ object MeetingProsIntegration {
             })
         }
         requireNotNull(doctors) { "Configure first" }.authenticate(userId).getOrThrow()
-        this.userId = userId
+        preferences.edit { putString(USER_ID, userId) }
         registerPushToken()
     }
 
@@ -127,7 +143,7 @@ object MeetingProsIntegration {
             })
         }
         doctors?.deauthenticate()
-        userId = null
+        preferences.edit { remove(USER_ID) }
     }
 
     /** Opens the list of the given type on top of `activity`; tapping a professional opens its chat. */
@@ -165,7 +181,7 @@ object MeetingProsIntegration {
         val hasBooking = doctors.hasBookingVCSync().getOrDefault(false)
         buildSet {
             if (VideoCallClient.hasVideoCall()) add(DoctorsFeature.VIDEO_CALL)
-            if (doctors.hasMedicalHistory()) add(DoctorsFeature.MEDICAL_HISTORY)
+            if (doctors.hasMedicalHistorySync().getOrDefault(false)) add(DoctorsFeature.MEDICAL_HISTORY)
             if (doctors.hasFeedsSync().getOrDefault(false)) add(DoctorsFeature.MY_HEALTH)
             // Appointments has no check of its own on Android: it comes with booking.
             if (hasBooking) addAll(listOf(DoctorsFeature.BOOKING, DoctorsFeature.APPOINTMENTS))
@@ -185,7 +201,10 @@ object MeetingProsIntegration {
         }
     }
 
-    /** Routes an FCM message to the SDK that owns it; returns false when it belongs to neither. */
+    /**
+     * Routes an FCM message to the SDK that owns it. The video call SDK takes every data push that is not a chat
+     * one, so it returns false only for notification-only pushes.
+     */
     fun onMessageReceived(message: RemoteMessage): Boolean {
         if (!isConfigured) return false
         val lawyersPayload = message.data["data"]
@@ -206,7 +225,7 @@ object MeetingProsIntegration {
 
     /** Logs the user into the video call service and opens the call with the duty doctor. */
     private suspend fun startVideoCall(activity: Activity) {
-        val user = requireNotNull(userId) { "Authenticate first" }
+        val user = requireNotNull(preferences.getString(USER_ID, null)) { "Authenticate first" }
         suspendCancellableCoroutine { continuation ->
             VideoCallClient.login(user, object : VideoCallClient.LoginResponseListener {
                 override fun onLoginSuccess() {

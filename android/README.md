@@ -29,7 +29,17 @@ dependencyResolutionManagement {
 }
 ```
 
-In `app/build.gradle.kts` (the SDK brings Firebase Crashlytics, so its plugin is required):
+Declare the Firebase plugins in the root `build.gradle.kts` (the SDK brings Firebase Crashlytics, so its
+plugin is required):
+
+```kotlin
+plugins {
+    id("com.google.gms.google-services") version "4.4.4" apply false
+    id("com.google.firebase.crashlytics") version "2.9.9" apply false
+}
+```
+
+And apply them in `app/build.gradle.kts`:
 
 ```kotlin
 plugins {
@@ -49,12 +59,12 @@ dependencies {
 | File | What it does |
 |------|------|
 | [`MeetingLawyersIntegration.kt`](app/src/main/java/com/meetinglawyers/sample/MeetingLawyersIntegration.kt) | Every SDK call: `configure`, `configureTheme`, `authenticate`, `openProfessionalList`, `openChat`, `isAuthenticated`, `logout`, push forwarding |
-| [`SampleMessagingService.kt`](app/src/main/java/com/meetinglawyers/sample/SampleMessagingService.kt) | Forwards FCM messages and tokens. If your app already has a `FirebaseMessagingService`, add its two calls to yours instead |
+| [`MeetingLawyersMessagingService.kt`](app/src/main/java/com/meetinglawyers/sample/MeetingLawyersMessagingService.kt) | Forwards FCM messages and tokens. If your app already has a `FirebaseMessagingService`, add its two calls to yours instead |
 
 Register the service in `AndroidManifest.xml`:
 
 ```xml
-<service android:name=".SampleMessagingService" android:exported="false">
+<service android:name=".MeetingLawyersMessagingService" android:exported="false">
     <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT" />
     </intent-filter>
@@ -71,7 +81,7 @@ MeetingLawyersIntegration.configureTheme(Color.parseColor("#2E7D6B"))
 **4. Use it** from your screens:
 
 ```kotlin
-MeetingLawyersIntegration.authenticate("<user id>") { error -> /* null on success */ }
+MeetingLawyersIntegration.authenticate("<user id>") { error -> /* null on success, on the main thread */ }
 MeetingLawyersIntegration.openProfessionalList(activity)
 MeetingLawyersIntegration.openChat(activity, professionalHash)
 MeetingLawyersIntegration.logout { error -> }
@@ -81,6 +91,10 @@ MeetingLawyersIntegration.logout { error -> }
 permission on Android 13+ after signing in (see [`MainActivity.kt`](app/src/main/java/com/meetinglawyers/sample/MainActivity.kt)),
 and share your Firebase credentials with MeetingLawyers as described in the
 [push notifications guide](https://developer.meetinglawyers.com/docs/android/push-notifications/).
+
+**6. Backups.** Keep the SDK session on the device: set `android:allowBackup="false"` and point
+`android:dataExtractionRules` to rules that exclude everything, like
+[`data_extraction_rules.xml`](app/src/main/res/xml/data_extraction_rules.xml) (see `AndroidManifest.xml`).
 
 The contract each call fulfils is in [`specs/`](../specs/).
 

@@ -1,8 +1,11 @@
 package com.meetinglawyers.sample.ionic
 
 import android.Manifest
+import android.app.Application
+import android.content.Context
 import android.graphics.Color
 import android.os.Build
+import androidx.core.content.edit
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
 import com.getcapacitor.PermissionState
@@ -21,7 +24,7 @@ import kotlinx.coroutines.launch
 
 /**
  * Capacitor bridge to [MeetingProsIntegration]. Copy this file plus `MeetingProsIntegration.kt`,
- * `MeetingProsFirebaseService.kt` (and `src/plugins/meeting-pros/`) into your Capacitor app.
+ * `MeetingProsMessagingService.kt` (and `src/plugins/meeting-pros/`) into your Capacitor app.
  */
 @CapacitorPlugin(
     name = "MeetingPros",
@@ -46,11 +49,15 @@ class MeetingProsPlugin : Plugin() {
     fun configure(call: PluginCall) {
         val lawyersApiKey = call.getString("lawyersApiKey").orEmpty()
         if (lawyersApiKey.isEmpty()) return call.reject("lawyersApiKey is required")
+        val doctorsApiKey = call.getString("doctorsApiKey").orEmpty()
+        val isProduction = call.getString("environment") != "DEV"
         run(call) {
-            integration.configure(
-                activity.application, lawyersApiKey, call.getString("doctorsApiKey").orEmpty(),
-                isProduction = call.getString("environment") != "DEV", pushActivity = MainActivity::class.java,
-            )
+            integration.configure(activity.application, lawyersApiKey, doctorsApiKey, isProduction, MainActivity::class.java)
+            savedArguments(activity.application).edit {
+                putString(LAWYERS_API_KEY, lawyersApiKey)
+                putString(DOCTORS_API_KEY, doctorsApiKey)
+                putBoolean(IS_PRODUCTION, isProduction)
+            }
         }
     }
 
@@ -149,5 +156,25 @@ class MeetingProsPlugin : Plugin() {
             else -> return null
         }
         return runCatching { Color.parseColor("#$argb") }.getOrNull()
+    }
+
+    companion object {
+        private const val LAWYERS_API_KEY = "lawyersApiKey"
+        private const val DOCTORS_API_KEY = "doctorsApiKey"
+        private const val IS_PRODUCTION = "isProduction"
+
+        /** Configures both SDKs with the arguments of the last `configure`, e.g. when a push wakes the killed app. */
+        fun configureFromSavedArguments(application: Application) {
+            if (MeetingProsIntegration.isConfigured) return
+            val saved = savedArguments(application)
+            val lawyersApiKey = saved.getString(LAWYERS_API_KEY, null) ?: return
+            val doctorsApiKey = saved.getString(DOCTORS_API_KEY, null) ?: return
+            MeetingProsIntegration.configure(
+                application, lawyersApiKey, doctorsApiKey, saved.getBoolean(IS_PRODUCTION, true), MainActivity::class.java,
+            )
+        }
+
+        private fun savedArguments(application: Application) =
+            application.getSharedPreferences("meeting_pros_plugin", Context.MODE_PRIVATE)
     }
 }

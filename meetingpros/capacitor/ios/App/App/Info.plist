@@ -25,17 +25,17 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>This app needs camera access to attach photos in the chat.</string>
+	<string>Send photos to your professional in the chat and join video calls.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>This app needs microphone access to record and send voice messages.</string>
+	<string>Send audio messages and join video calls.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>armv7</string>
-	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

@@ -1,17 +1,13 @@
 import Capacitor
+import FirebaseMessaging
 import MeetingLawyers
 import UIKit
 import UserNotifications
-#if canImport(FirebaseCore)
-import FirebaseCore
-#endif
-#if canImport(FirebaseMessaging)
-import FirebaseMessaging
-#endif
 
 /// Capacitor bridge to the MeetingLawyers iOS SDK.
 /// Self-contained: copy this file (plus `src/plugins/meeting-lawyers/`) into your
-/// own Capacitor project and register it in your bridge view controller.
+/// own Capacitor project, register it in your bridge view controller and call
+/// `startHandlingPushNotifications()` on launch.
 @objc(MeetingLawyersPlugin)
 public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "MeetingLawyersPlugin"
@@ -152,28 +148,24 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    /// Asks for notification permission and registers the FCM token with the SDK.
+    /// Takes over push delivery; call it from `didFinishLaunching`, after `FirebaseApp.configure()`.
+    public static func startHandlingPushNotifications() {
+        Messaging.messaging().delegate = PushDelegate.shared
+        UNUserNotificationCenter.current().delegate = PushDelegate.shared
+    }
+
+    /// Asks for notification permission and sends the current FCM token to the SDK.
     @objc func registerForPushNotifications(_ call: CAPPluginCall) {
-        #if canImport(FirebaseCore) && canImport(FirebaseMessaging)
-        Task { @MainActor in
-            guard FirebaseApp.app() != nil
-                    || Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil else {
-                call.reject("Firebase is not configured. Add GoogleService-Info.plist to the iOS app.")
+        Task {
+            _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
+            await MainActor.run { UIApplication.shared.registerForRemoteNotifications() }
+            guard let token = try? await Messaging.messaging().token() else {
+                call.reject("Could not fetch the FCM token")
                 return
             }
-            if FirebaseApp.app() == nil {
-                FirebaseApp.configure()
-            }
-            Messaging.messaging().delegate = self
-            UNUserNotificationCenter.current().delegate = self
-            let options: UNAuthorizationOptions = [.alert, .badge, .sound]
-            _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: options)
-            UIApplication.shared.registerForRemoteNotifications()
+            try? await MeetingLawyersApp.setFirebaseMessagingToken(token: token)
             call.resolve()
         }
-        #else
-        call.reject("FirebaseMessaging is not linked. Add the firebase-ios-sdk package to enable push.")
-        #endif
     }
 
     /// Returns whether a user is currently authenticated in the SDK.
@@ -194,40 +186,37 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 }
 
-#if canImport(FirebaseMessaging)
-extension MeetingLawyersPlugin: MessagingDelegate {
-    /// Forwards every FCM token refresh to the SDK.
-    public func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        guard let fcmToken else { return }
-        Task {
-            try? await MeetingLawyersApp.setFirebaseMessagingToken(token: fcmToken)
-        }
-    }
-}
-#endif
+/// Push delegates, shared so they are set on launch before the web layer loads.
+private final class PushDelegate: NSObject, MessagingDelegate, UNUserNotificationCenterDelegate {
+    static let shared = PushDelegate()
 
-extension MeetingLawyersPlugin: UNUserNotificationCenterDelegate {
-    /// Lets the SDK handle its own pushes in foreground; shows the rest normally.
-    public func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                       willPresent notification: UNNotification,
-                                       withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        if MeetingLawyersApp.isMeetingLawyersPush(userInfo: notification.request.content.userInfo) {
-            _ = MeetingLawyersApp.userNotificationCenter(willPresent: notification.request, completionHandler: completionHandler)
-            return
-        }
-        completionHandler([.banner, .badge, .sound])
+    /// Forwards token refreshes once a user is signed in.
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        guard let fcmToken, MeetingLawyersApp.isAuthenticated() else { return }
+        Task { try? await MeetingLawyersApp.setFirebaseMessagingToken(token: fcmToken) }
     }
 
-    /// Lets the SDK react to taps on its own pushes (e.g. open the chat).
-    public func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                       didReceive response: UNNotificationResponse,
-                                       withCompletionHandler completionHandler: @escaping () -> Void) {
-        if MeetingLawyersApp.isMeetingLawyersPush(userInfo: response.notification.request.content.userInfo) {
-            _ = MeetingLawyersApp.userNotificationCenter(didReceive: response.notification.request) { _ in
-                completionHandler()
-            }
+    /// Lets the SDK present its own pushes in foreground; shows the rest normally.
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        guard MeetingLawyersApp.isMeetingLawyersPush(notification: notification) else {
+            completionHandler([.banner, .badge, .sound])
             return
         }
-        completionHandler()
+        _ = MeetingLawyersApp.userNotificationCenter(willPresent: notification.request, completionHandler: completionHandler)
+    }
+
+    /// Lets the SDK open the chat of a tapped push; ignores the rest.
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        guard MeetingLawyersApp.isMeetingLawyersPush(notification: response.notification) else {
+            completionHandler()
+            return
+        }
+        _ = MeetingLawyersApp.userNotificationCenter(didReceive: response.notification.request) { _ in
+            completionHandler()
+        }
     }
 }

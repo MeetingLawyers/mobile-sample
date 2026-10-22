@@ -49,7 +49,7 @@ export interface IsAuthenticatedResult {
  * - Android: android/app/src/main/java/.../MeetingProsPlugin.kt + MeetingProsIntegration.kt
  */
 export interface MeetingProsPlugin {
-  /** Configures both SDKs. Call once at app startup, before any other method. */
+  /** Configures both SDKs. Call it at app startup, before any other method; later calls do nothing. */
   configure(options: ConfigureOptions): Promise<void>;
   /** Applies the brand color to both SDKs. */
   configureTheme(options: ThemeOptions): Promise<void>;
