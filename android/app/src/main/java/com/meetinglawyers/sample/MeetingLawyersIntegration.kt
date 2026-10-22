@@ -2,6 +2,8 @@ package com.meetinglawyers.sample
 
 import android.app.Activity
 import android.app.Application
+import android.os.Handler
+import android.os.Looper
 import com.google.firebase.messaging.FirebaseMessaging
 import com.meetinglawyers.sdk.CustomerSdkBuildMode
 import com.meetinglawyers.sdk.MeetingLawyersClient
@@ -15,6 +17,8 @@ object MeetingLawyersIntegration {
 
     private val client: MeetingLawyersClient
         get() = MeetingLawyersSDK.getClientInstance()
+
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     val isConfigured: Boolean
         get() = MeetingLawyersSDK.isInitialized()
@@ -37,7 +41,7 @@ object MeetingLawyersIntegration {
         client.setOngoingMessageBgColor(color)
     }
 
-    /** Signs the user in and links this device's push token to them; `onResult` gets the error, or null. */
+    /** Signs the user in and links this device's push token to them; `onResult` gets the error, or null, on the main thread. */
     fun authenticate(userId: String, onResult: (String?) -> Unit) {
         client.authenticate(userId, callback { error ->
             if (error == null) registerPushToken()
@@ -45,7 +49,7 @@ object MeetingLawyersIntegration {
         })
     }
 
-    /** Signs the user out of the SDK; `onResult` gets the error, or null. */
+    /** Signs the user out of the SDK; `onResult` gets the error, or null, on the main thread. */
     fun logout(onResult: (String?) -> Unit) {
         client.deauthenticate(callback(onResult))
     }
@@ -76,9 +80,14 @@ object MeetingLawyersIntegration {
         FirebaseMessaging.getInstance().token.addOnSuccessListener { token -> client.onNewTokenReceived(token) }
     }
 
-    /** Adapts the SDK callback to a single `(error) -> Unit` lambda. */
+    /** Adapts the SDK callback to a single `(error) -> Unit` lambda, delivered on the main thread. */
     private fun callback(onResult: (String?) -> Unit) = object : SDKCallbackWithoutData {
-        override fun onSuccess() = onResult(null)
-        override fun onError(message: String?) = onResult(message ?: "Unknown error")
+        override fun onSuccess() {
+            mainHandler.post { onResult(null) }
+        }
+
+        override fun onError(message: String?) {
+            mainHandler.post { onResult(message ?: "Unknown error") }
+        }
     }
 }
