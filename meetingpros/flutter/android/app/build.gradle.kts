@@ -18,7 +18,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.meetinglawyers.sdk.sample"
+        applicationId = "com.meetinglawyers.meetingpreview.dev"
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

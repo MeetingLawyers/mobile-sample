@@ -108,5 +108,5 @@ The contract each call fulfils is in [`specs/`](../specs/).
 3. **Sign in** → **Open professional list** → tap a professional to chat. You can also open a chat by
    professional hash.
 
-The sample ships the Firebase client config of `com.meetinglawyers.sdk.sample` (MeetingLawyers demo
-project); with your own app, bring your own.
+The sample ships the Firebase client config of `com.meetinglawyers.meetingpreview.dev` (MeetingPreview
+demo app); with your own app, bring your own.

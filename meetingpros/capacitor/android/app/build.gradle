@@ -5,7 +5,7 @@ android {
     namespace = "com.meetinglawyers.sample.ionic"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.meetinglawyers.sdk.sample"
+        applicationId "com.meetinglawyers.meetingpreview.dev"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
