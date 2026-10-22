@@ -171,4 +171,4 @@ available.
 |---|---|
 | `meetingpros/ios/` | `MeetingProsIntegration.swift`, called from the home screen |
 | `meetingpros/android/` | `MeetingProsIntegration.kt`, called from `App` and the home screen |
-| `meetingpros/capacitor/` | — |
+| `meetingpros/capacitor/` | `src/plugins/meeting-pros/`, bridged to the same `MeetingProsIntegration` files |

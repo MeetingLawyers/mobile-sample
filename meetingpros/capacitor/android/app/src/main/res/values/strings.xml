@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MP Sample</string>
+    <string name="title_activity_main">MP Sample</string>
+    <string name="package_name">com.meetinglawyers.sample.ionic</string>
+    <string name="custom_url_scheme">com.meetinglawyers.sample.ionic</string>
+</resources>

@@ -2,6 +2,7 @@ package com.meetinglawyers.meetingpros.sample
 
 import android.app.Activity
 import android.app.Application
+import androidx.activity.addCallback
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.RemoteMessage
@@ -149,6 +150,8 @@ object MeetingProsIntegration {
             fitsSystemWindows = true
             requestApplyInsets()
         }
+        // Back closes the list, even when the host (e.g. a web view) handles back itself.
+        activity.onBackPressedDispatcher.addCallback(list) { fragments.popBackStack() }
     }
 
     /** Opens the chat with the lawyer identified by `professionalHash`. */

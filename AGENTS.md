@@ -24,6 +24,7 @@ free of anything internal.
 | `capacitor/` | Ionic + Capacitor sample with the copy-paste MeetingLawyers plugin |
 | `meetingpros/ios/` | MeetingPros iOS sample: `MeetingProsIntegration.swift` owns both SDKs |
 | `meetingpros/android/` | MeetingPros Android sample: `MeetingProsIntegration.kt` owns both SDKs |
+| `meetingpros/capacitor/` | MeetingPros Capacitor sample: plugin over copies of both `MeetingProsIntegration` files |
 | `specs/<capability>/spec.md` | Contract every sample's wrapper fulfils |
 | `.env.example` | Credential keys every sample reads |
 
