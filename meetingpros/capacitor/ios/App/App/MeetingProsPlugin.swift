@@ -121,7 +121,7 @@ public class MeetingProsPlugin: CAPPlugin, CAPBridgedPlugin {
     @MainActor
     private func navigationController() throws -> UINavigationController {
         guard let navigationController = bridge?.viewController?.navigationController else {
-            throw CAPPluginError.navigationUnavailable
+            throw MeetingProsPluginError.navigationUnavailable
         }
         return navigationController
     }
@@ -140,7 +140,7 @@ public class MeetingProsPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 }
 
-private enum CAPPluginError: LocalizedError {
+private enum MeetingProsPluginError: LocalizedError {
     case navigationUnavailable
 
     var errorDescription: String? { "The bridge view controller is not inside a UINavigationController" }
