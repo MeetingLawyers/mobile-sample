@@ -18,6 +18,10 @@ updates:
     directories: ['/capacitor', '/meetingpros/capacitor']
     schedule:
       interval: monthly
+    # Major versions (Ionic, React Router, TypeScript...) need a migration: update them by hand.
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
     groups:
       npm:
         patterns: ['*']
