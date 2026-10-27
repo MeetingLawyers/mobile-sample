@@ -55,5 +55,10 @@
     "vite": "^8.3.5",
     "vitest": "^4.1.12"
   },
-  "description": "MeetingPros Ionic + Capacitor sample"
+  "description": "MeetingPros Ionic + Capacitor sample",
+  "overrides": {
+    "xcode": {
+      "uuid": "^11.1.1"
+    }
+  }
 }
