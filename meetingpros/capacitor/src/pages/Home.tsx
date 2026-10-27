@@ -54,7 +54,7 @@ const Home: React.FC = () => {
       await MeetingPros.configureTheme({ primaryColor: BRAND_COLOR });
       const { authenticated } = await MeetingPros.isAuthenticated();
       setStatus(authenticated ? 'authenticated' : 'configured');
-      if (authenticated) await loadFeatures();
+      if (authenticated) setFeatures((await MeetingPros.availableFeatures()).features);
     } catch (e) {
       setStatus('missing-credentials');
       setError(describe(e));
