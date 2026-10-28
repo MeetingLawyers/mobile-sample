@@ -34,9 +34,12 @@ updates:
     registries: [meetinglawyers-maven]
     schedule:
       interval: monthly
-    # The Firebase BoM must match the one the MeetingLawyers SDK is built against.
+    # The Firebase BoM must match the one the MeetingLawyers SDK is built against; majors (AGP, Gradle,
+    # Kotlin...) need a migration: update them by hand.
     ignore:
       - dependency-name: com.google.firebase:firebase-bom
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
     groups:
       gradle:
         patterns: ['*']
