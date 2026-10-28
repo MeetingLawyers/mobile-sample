@@ -35,32 +35,17 @@ jobs:
     needs: dart
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    # The SDK is served from GitHub Packages; secrets are not available on pull requests from forks.
-    env:
-      GPR_USER: ${{ secrets.GPR_USER }}
-      GPR_TOKEN: ${{ secrets.GPR_TOKEN }}
     steps:
-      - name: Check GitHub Packages credentials
-        id: gpr
-        run: |
-          if [ -z "$GPR_TOKEN" ]; then
-            echo "::notice::GPR_TOKEN is not available (pull request from a fork?): skipping the Android build."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          fi
       - uses: actions/checkout@v7
-        if: steps.gpr.outputs.skip != 'true'
       - uses: actions/setup-java@v6
-        if: steps.gpr.outputs.skip != 'true'
         with:
           distribution: temurin
           java-version: 17
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
-        if: steps.gpr.outputs.skip != 'true'
         with:
           channel: stable
           cache: true
       - name: Build
-        if: steps.gpr.outputs.skip != 'true'
         working-directory: meetingpros/flutter
         run: flutter build apk --debug
 
