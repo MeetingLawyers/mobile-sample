@@ -47,3 +47,4 @@ Native `android/` returns nothing: the SDK reports no errors when opening the li
 | `ios/` | `MeetingLawyersIntegration.openProfessionalList`, pushed onto the app navigation |
 | `android/` | `MeetingLawyersIntegration.openProfessionalList`, opened on top of the activity stack |
 | `capacitor/` | `Home.tsx` → `MeetingLawyers.openProfessionalList()` |
+| `flutter/` | `main.dart` → `MeetingLawyers.openProfessionalList()` |

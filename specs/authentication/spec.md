@@ -39,3 +39,4 @@ company. It MUST be called after configure.
 | `ios/` | `MeetingLawyersIntegration.authenticate`, from "Sign in" |
 | `android/` | `MeetingLawyersIntegration.authenticate`, from "Sign in" |
 | `capacitor/` | `Home.tsx` → `MeetingLawyers.authenticate()` |
+| `flutter/` | `main.dart` → `MeetingLawyers.authenticate()` |

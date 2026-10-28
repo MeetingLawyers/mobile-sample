@@ -51,3 +51,4 @@ The wrapper MUST reject the call when the API key is missing or empty.
 | `ios/` | `MeetingLawyersIntegration.configure`, called when the home screen loads |
 | `android/` | `MeetingLawyersIntegration.configure`, from `App.onCreate` |
 | `capacitor/` | `Home.tsx` → `MeetingLawyers.configure()` |
+| `flutter/` | `main.dart` → `MeetingLawyers.configure()` |

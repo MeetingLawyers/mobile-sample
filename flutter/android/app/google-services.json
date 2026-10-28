@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "925068427380",
+    "project_id": "development-2-5f302",
+    "storage_bucket": "development-2-5f302.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:925068427380:android:965a82ca2d7200a1bf1121",
+        "android_client_info": {
+          "package_name": "com.meetinglawyers.meetingpreview.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "925068427380-pmmco1fcmmcgcv178k4f8kpj5t5gg9ao.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSY-zg0AAfxL33L6X6xO5hqToitKemeOc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "925068427380-pmmco1fcmmcgcv178k4f8kpj5t5gg9ao.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -40,3 +40,4 @@ Native `android/` returns nothing: the SDK reports no errors when opening the ch
 | `ios/` | `MeetingLawyersIntegration.openChat`, from "Open chat" with a hash |
 | `android/` | `MeetingLawyersIntegration.openChat`, from "Open chat" with a hash |
 | `capacitor/` | `Home.tsx` → "Open chat" with a professional hash |
+| `flutter/` | `main.dart` → "Open chat" with a professional hash |
