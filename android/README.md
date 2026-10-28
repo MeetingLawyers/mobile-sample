@@ -7,11 +7,11 @@ Full documentation: [developer.meetinglawyers.com](https://developer.meetinglawy
 
 ## Add it to your app
 
-Every SDK call lives in one file you copy. Ask for your API key and GitHub Packages access at
+Every SDK call lives in one file you copy. Ask for your API key at
 [support@meetinglawyers.com](mailto:support@meetinglawyers.com).
 
-**1. Add the SDK.** It is served from GitHub Packages, which needs a GitHub user and a token with
-`read:packages`. In `settings.gradle.kts`:
+**1. Add the SDK.** It is served from a public Maven repository, no credentials needed. In
+`settings.gradle.kts`:
 
 ```kotlin
 dependencyResolutionManagement {
@@ -19,11 +19,8 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven {
-            url = uri("https://maven.pkg.github.com/MeetingLawyers/android-sdk-chat/")
-            credentials {
-                username = providers.gradleProperty("GPR_USER").orNull ?: System.getenv("GPR_USER")
-                password = providers.gradleProperty("GPR_TOKEN").orNull ?: System.getenv("GPR_TOKEN")
-            }
+            url = uri("https://sdk-download.meetinglawyers.com/android/maven/")
+            content { includeGroup("com.meetinglawyers") }
         }
     }
 }
@@ -102,8 +99,7 @@ The contract each call fulfils is in [`specs/`](../specs/).
 
 1. Fill in the repo-root `.env` (git-ignored), see the [root README](../README.md#credentials).
    `ML_API_KEY`, `ML_USER_ID` and `ML_ENVIRONMENT` reach the app through `BuildConfig`
-   ([`Constants.kt`](app/src/main/java/com/meetinglawyers/sample/Constants.kt)); `GPR_USER` / `GPR_TOKEN`
-   can also come from `~/.gradle/gradle.properties` or environment variables.
+   ([`Constants.kt`](app/src/main/java/com/meetinglawyers/sample/Constants.kt)).
 2. Open this `android/` folder in Android Studio and run `app`, or `./gradlew installDebug`.
 3. **Sign in** → **Open professional list** → tap a professional to chat. You can also open a chat by
    professional hash.

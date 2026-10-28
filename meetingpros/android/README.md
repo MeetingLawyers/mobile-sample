@@ -10,11 +10,11 @@ Full documentation: [developer.meetinglawyers.com](https://developer.meetinglawy
 ## Add it to your app
 
 Both SDKs live behind one file you copy: the rest of your app never imports them. Ask for your MeetingPros
-API keys (lawyers and doctors) and GitHub Packages access at
+API keys (lawyers and doctors) at
 [support@meetinglawyers.com](mailto:support@meetinglawyers.com).
 
-**1. Add the SDKs.** In `settings.gradle.kts`, the MeetingDoctors repository (public) and the MeetingLawyers
-one (GitHub Packages: a GitHub user and a token with `read:packages`):
+**1. Add the SDKs.** In `settings.gradle.kts`, the MeetingDoctors and MeetingLawyers repositories
+(both public, no credentials):
 
 ```kotlin
 dependencyResolutionManagement {
@@ -23,11 +23,8 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url = uri("https://storage.googleapis.com/production-mobile-sdks/android/") }
         maven {
-            url = uri("https://maven.pkg.github.com/MeetingLawyers/android-sdk-chat/")
-            credentials {
-                username = providers.gradleProperty("GPR_USER").orNull ?: System.getenv("GPR_USER")
-                password = providers.gradleProperty("GPR_TOKEN").orNull ?: System.getenv("GPR_TOKEN")
-            }
+            url = uri("https://sdk-download.meetinglawyers.com/android/maven/")
+            content { includeGroup("com.meetinglawyers") }
         }
     }
 }

@@ -18,31 +18,13 @@ buildscript {
 
 apply from: "variables.gradle"
 
-// Credentials live in the repo-root .env (git-ignored), see ../../.env.example.
-def dotEnv = [:]
-def dotEnvFile = file('../../.env')
-if (dotEnvFile.exists()) {
-    dotEnvFile.eachLine { line ->
-        def parts = line.split('=', 2)
-        if (parts.size() == 2 && !parts[0].trim().startsWith('#')) {
-            dotEnv[parts[0].trim()] = parts[1].trim()
-        }
-    }
-}
-def credential = { String key -> dotEnv[key] ?: findProperty(key) ?: System.getenv(key) ?: '' }
-
 allprojects {
     repositories {
         google()
         mavenCentral()
         maven {
-            url "https://maven.pkg.github.com/MeetingLawyers/android-sdk-chat/"
-            credentials {
-                // GitHub Packages requires credentials even for public consumers:
-                // .env first, then ~/.gradle/gradle.properties, then environment variables.
-                username = credential('GPR_USER')
-                password = credential('GPR_TOKEN')
-            }
+            url "https://sdk-download.meetinglawyers.com/android/maven/"
+            content { includeGroup "com.meetinglawyers" }
         }
     }
 }

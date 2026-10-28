@@ -51,7 +51,6 @@ cp .env.example .env
 | `ML_USER_ID` | all | A user identifier valid for that API key |
 | `ML_ENVIRONMENT` | all | `DEV` (demo environment) or `PROD` |
 | `MD_API_KEY` | MeetingPros samples | Your MeetingDoctors API key |
-| `GPR_USER` / `GPR_TOKEN` | Android builds | GitHub user and a token with `read:packages`: the Android SDK is served from GitHub Packages |
 
 With MeetingPros credentials (`ML_API_KEY` of a MeetingPros company plus its `MD_API_KEY`) one `.env`
 runs every sample. Write plain `KEY=value` lines with no comments: the iOS projects read this file as an Xcode `.xcconfig`.

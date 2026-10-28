@@ -10,7 +10,7 @@ Check the full documentation at
 ## Add it to your app
 
 All the SDK integration lives in a small **copy-paste wrapper** (a local Capacitor plugin), so the rest of
-your app never imports the SDKs. Ask for your API key and GitHub Packages access at
+your app never imports the SDKs. Ask for your API key at
 [support@meetinglawyers.com](mailto:support@meetinglawyers.com).
 
 **1. Copy the wrapper:**
@@ -40,8 +40,7 @@ MeetingLawyersPlugin.startHandlingPushNotifications()
 ```
 
 **3. Android.** In `android/build.gradle`, add the Firebase Gradle plugins (the SDK brings Crashlytics, so
-its plugin is required) and the GitHub Packages repository (it needs a GitHub user and a token with
-`read:packages`):
+its plugin is required) and the MeetingLawyers repository (public, no credentials):
 
 ```groovy
 buildscript {
@@ -54,11 +53,8 @@ buildscript {
 allprojects {
     repositories {
         maven {
-            url "https://maven.pkg.github.com/MeetingLawyers/android-sdk-chat/"
-            credentials {
-                username = findProperty('GPR_USER') ?: System.getenv('GPR_USER')
-                password = findProperty('GPR_TOKEN') ?: System.getenv('GPR_TOKEN')
-            }
+            url "https://sdk-download.meetinglawyers.com/android/maven/"
+            content { includeGroup "com.meetinglawyers" }
         }
     }
 }
@@ -148,9 +144,6 @@ Only the `ML_*` values reach the web bundle ([`vite.config.ts`](vite.config.ts))
 [`src/config/constants.ts`](src/config/constants.ts) reads them. If you copy the wrapper into your own
 app, pass your own values to `configure()` / `authenticate()` however your app manages configuration.
 
-The Android build reads `GPR_USER` / `GPR_TOKEN` from the same `.env`, falling back to
-`~/.gradle/gradle.properties` or environment variables.
-
 ## Run it
 
 Requirements: Node 22+, Xcode 26+ (iOS) and Android Studio (Android).
@@ -162,7 +155,7 @@ npm install
 npm run ios          # build web + cap sync + run on simulator/device
 npm run open:ios     # or open the project in Xcode
 
-# Android (with GPR_USER / GPR_TOKEN available)
+# Android
 npm run android      # build web + cap sync + run on emulator/device
 npm run open:android # or open the project in Android Studio
 ```

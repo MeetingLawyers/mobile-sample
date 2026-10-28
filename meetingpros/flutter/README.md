@@ -11,7 +11,7 @@ Full documentation: [developer.meetinglawyers.com](https://developer.meetinglawy
 
 The native code that imports the SDKs is the same `MeetingProsIntegration` file as in the native samples
 ([iOS](../ios/), [Android](../android/)); a method channel only translates the calls. No Flutter package is
-needed. Ask for your MeetingPros API keys (lawyers and doctors) and GitHub Packages access at
+needed. Ask for your MeetingPros API keys (lawyers and doctors) at
 [support@meetinglawyers.com](mailto:support@meetinglawyers.com).
 
 **1. Copy the bridge:**
@@ -35,8 +35,8 @@ needed. Ask for your MeetingPros API keys (lawyers and doctors) and GitHub Packa
 - Add your `GoogleService-Info.plist`, *Push Notifications* and *Background Modes → Remote notifications*
   capabilities, and `NSCameraUsageDescription` / `NSMicrophoneUsageDescription` to `Info.plist`.
 
-**3. Android.** Add the MeetingDoctors repository (public) and the MeetingLawyers one (GitHub Packages, a
-token with `read:packages`) to `android/build.gradle.kts`:
+**3. Android.** Add the MeetingDoctors and MeetingLawyers repositories (both public, no
+credentials) to `android/build.gradle.kts`:
 
 ```kotlin
 allprojects {
@@ -45,11 +45,8 @@ allprojects {
         mavenCentral()
         maven { url = uri("https://storage.googleapis.com/production-mobile-sdks/android/") }
         maven {
-            url = uri("https://maven.pkg.github.com/MeetingLawyers/android-sdk-chat/")
-            credentials {
-                username = providers.gradleProperty("GPR_USER").orNull ?: System.getenv("GPR_USER")
-                password = providers.gradleProperty("GPR_TOKEN").orNull ?: System.getenv("GPR_TOKEN")
-            }
+            url = uri("https://sdk-download.meetinglawyers.com/android/maven/")
+            content { includeGroup("com.meetinglawyers") }
         }
     }
 }
@@ -99,8 +96,7 @@ The contract the bridge fulfils is in [`specs/meetingpros/`](../../specs/meeting
 
 ## Run this sample
 
-1. Fill in the repo-root `.env` (git-ignored), see the [root README](../../README.md#credentials). The
-   Android build reads `GPR_USER` / `GPR_TOKEN` from the same file.
+1. Fill in the repo-root `.env` (git-ignored), see the [root README](../../README.md#credentials).
 2. Requirements: Flutter 3.47+, Xcode 26+ and Android Studio.
 
 ```bash

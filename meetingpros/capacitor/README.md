@@ -11,7 +11,7 @@ Full documentation: [developer.meetinglawyers.com](https://developer.meetinglawy
 
 The native code that imports the SDKs is the same `MeetingProsIntegration` file as in the native samples
 ([iOS](../ios/), [Android](../android/)); the plugin only translates the calls. Ask for your MeetingPros API
-keys (lawyers and doctors) and GitHub Packages access at
+keys (lawyers and doctors) at
 [support@meetinglawyers.com](mailto:support@meetinglawyers.com).
 
 **1. Copy the plugin:**
@@ -42,19 +42,15 @@ video calls), and in **Signing & Capabilities** add *Push Notifications* and *Ba
 notifications* (see [`App.entitlements`](ios/App/App/App.entitlements)).
 
 **3. Android.** The plugin is Kotlin, so apply `org.jetbrains.kotlin.android`. Add the MeetingDoctors
-repository (public) and the MeetingLawyers one (GitHub Packages, a token with `read:packages`) to
-`android/build.gradle`:
+and MeetingLawyers repositories (both public, no credentials) to `android/build.gradle`:
 
 ```groovy
 allprojects {
     repositories {
         maven { url "https://storage.googleapis.com/production-mobile-sdks/android/" }
         maven {
-            url "https://maven.pkg.github.com/MeetingLawyers/android-sdk-chat/"
-            credentials {
-                username = findProperty('GPR_USER') ?: System.getenv('GPR_USER')
-                password = findProperty('GPR_TOKEN') ?: System.getenv('GPR_TOKEN')
-            }
+            url "https://sdk-download.meetinglawyers.com/android/maven/"
+            content { includeGroup "com.meetinglawyers" }
         }
     }
 }
@@ -109,8 +105,7 @@ The contract the plugin fulfils is in [`specs/meetingpros/`](../../specs/meeting
 ## Run this sample
 
 1. Fill in the repo-root `.env` (git-ignored), see the [root README](../../README.md#credentials). Only the
-   `ML_*` and `MD_*` values reach the web bundle ([`vite.config.ts`](vite.config.ts)); the Android build reads
-   `GPR_USER` / `GPR_TOKEN` from the same file.
+   `ML_*` and `MD_*` values reach the web bundle ([`vite.config.ts`](vite.config.ts)).
 2. Requirements: Node 22+, Xcode 26+ and Android Studio.
 
 ```bash
