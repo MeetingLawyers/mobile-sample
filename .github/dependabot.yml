@@ -25,7 +25,7 @@ updates:
         patterns: ['*']
 
   - package-ecosystem: pub
-    directory: /meetingpros/flutter
+    directories: ['/flutter', '/meetingpros/flutter']
     schedule:
       interval: monthly
 

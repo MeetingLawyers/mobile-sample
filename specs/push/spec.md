@@ -62,3 +62,4 @@ The native samples ignore push errors: registration runs in the background after
 | `ios/` | `MeetingLawyersIntegration` push extension: delegates set on launch, token sent after authenticate |
 | `android/` | `MeetingLawyersMessagingService.kt` + `MeetingLawyersIntegration`: token sent after authenticate, permission asked on Android 13+ |
 | `capacitor/` | `Home.tsx`, right after authenticate; delegates set in `AppDelegate` (iOS), SDK configured from saved values when a push wakes the app (Android) |
+| `flutter/` | Inside `MeetingLawyers.authenticate()`; delegates set in `AppDelegate` (iOS), SDK configured from saved values when a push wakes the app (Android) |

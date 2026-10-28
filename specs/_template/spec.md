@@ -33,3 +33,4 @@ The wrapper MUST / SHOULD / MAY <behaviour>.
 | `ios/` | <screen or file> |
 | `android/` | <screen or file> |
 | `capacitor/` | <screen or file> |
+| `flutter/` | <screen or file> |

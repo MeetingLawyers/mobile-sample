@@ -46,3 +46,4 @@ The wrapper MUST sign the user out of the SDK.
 | `ios/` | Status line and "Log out" on the home screen |
 | `android/` | Status line and "Log out" on the home screen |
 | `capacitor/` | `Home.tsx` → status line and "Log out" |
+| `flutter/` | `main.dart` → status line and "Log out" |

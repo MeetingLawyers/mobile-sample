@@ -61,3 +61,4 @@ bar and outgoing message (iOS also takes a navigation bar logo).
 | `ios/` | `MeetingLawyersIntegration.configureTheme` (brand color and navigation logo) |
 | `android/` | `MeetingLawyersIntegration.configureTheme` (brand color), from `App.onCreate` |
 | `capacitor/` | `constants.ts` → `ML_THEME`, applied after configure |
+| `flutter/` | `main.dart` → `brandColor`, applied after configure |
