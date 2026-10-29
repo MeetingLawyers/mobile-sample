@@ -37,7 +37,7 @@ when its home screen loads, to show the status).
 
 ```swift
 let integration = MeetingLawyersIntegration.shared
-integration.configureTheme(color: .systemTeal, logo: UIImage(named: "logo"))
+integration.configureTheme(.init(primaryColor: .systemTeal), logo: UIImage(named: "logo")) // every color optional
 try await integration.authenticate(userId: "<user id>")   // also asks for push permission
 try integration.openProfessionalList(in: navigationController)
 try await integration.openChat(professionalHash: hash, from: viewController)

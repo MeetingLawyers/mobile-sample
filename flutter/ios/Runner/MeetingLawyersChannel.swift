@@ -31,7 +31,13 @@ final class MeetingLawyersChannel: NSObject, FlutterPlugin {
             try await integration.configure(apiKey: try Self.required("apiKey", in: arguments),
                                             isProduction: arguments["isProduction"] as? Bool ?? true)
         case "configureTheme":
-            integration.configureTheme(color: Self.color(arguments["color"] as? Int ?? 0), logo: nil)
+            integration.configureTheme(MeetingLawyersIntegration.Theme(
+                primaryColor: Self.color(arguments["primaryColor"]),
+                secondaryColor: Self.color(arguments["secondaryColor"]),
+                navigationBarColor: Self.color(arguments["navigationBarColor"]),
+                incomingMessageColor: Self.color(arguments["incomingMessageColor"]),
+                outgoingMessageColor: Self.color(arguments["outgoingMessageColor"])
+            ))
         case "authenticate":
             try await integration.authenticate(userId: try Self.required("userId", in: arguments))
         case "openProfessionalList":
@@ -65,10 +71,11 @@ final class MeetingLawyersChannel: NSObject, FlutterPlugin {
         return value
     }
 
-    /// Converts a Dart 0xAARRGGBB color.
-    private static func color(_ argb: Int) -> UIColor {
-        UIColor(red: CGFloat((argb >> 16) & 0xFF) / 255, green: CGFloat((argb >> 8) & 0xFF) / 255,
-                blue: CGFloat(argb & 0xFF) / 255, alpha: CGFloat((argb >> 24) & 0xFF) / 255)
+    /// Converts a Dart 0xAARRGGBB color; nil when the argument is missing.
+    private static func color(_ value: Any?) -> UIColor? {
+        guard let argb = value as? Int else { return nil }
+        return UIColor(red: CGFloat((argb >> 16) & 0xFF) / 255, green: CGFloat((argb >> 8) & 0xFF) / 255,
+                       blue: CGFloat(argb & 0xFF) / 255, alpha: CGFloat((argb >> 24) & 0xFF) / 255)
     }
 }
 

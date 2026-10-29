@@ -11,13 +11,12 @@ app's own notifications.
 
 ### Requirement: register after authentication
 
-The wrapper MUST ask for notification permission and register the device FCM token with the SDK. It SHOULD
-be called after authenticate, so the token is linked to the user.
+The wrapper MUST ask for notification permission and register the device FCM token with the SDK right after
+authenticate, so the token is linked to the user. The integrator does not call anything else.
 
 #### Scenario: register for push
 
-- WHEN the user is authenticated
-- AND the integrator registers for push notifications
+- WHEN the user authenticates
 - THEN the user is asked for notification permission
 - AND the FCM token is sent to the SDK
 
@@ -51,9 +50,7 @@ The wrapper MUST hand MeetingLawyers pushes to the SDK and MUST leave every othe
 
 | Situation | Result |
 |---|---|
-| Token cannot be fetched | Rejected: `Could not fetch the FCM token` |
-
-The native samples ignore push errors: registration runs in the background after authenticate.
+| Token cannot be fetched | Ignored: registration runs in the background and never fails authenticate |
 
 ## Shown in
 
@@ -61,5 +58,5 @@ The native samples ignore push errors: registration runs in the background after
 |---|---|
 | `ios/` | `MeetingLawyersIntegration` push extension: delegates set on launch, token sent after authenticate |
 | `android/` | `MeetingLawyersMessagingService.kt` + `MeetingLawyersIntegration`: token sent after authenticate, permission asked on Android 13+ |
-| `capacitor/` | `Home.tsx`, right after authenticate; delegates set in `AppDelegate` (iOS), SDK configured from saved values when a push wakes the app (Android) |
+| `capacitor/` | Inside `MeetingLawyers.authenticate()`; delegates set in `AppDelegate` (iOS), SDK configured from saved values when a push wakes the app (Android) |
 | `flutter/` | Inside `MeetingLawyers.authenticate()`; delegates set in `AppDelegate` (iOS), SDK configured from saved values when a push wakes the app (Android) |

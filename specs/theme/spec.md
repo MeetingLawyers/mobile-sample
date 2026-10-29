@@ -8,10 +8,18 @@ Applies the integrator's brand colors to the SDK screens from one place.
 
 ## Requirements
 
-### Requirement: hex colors, all optional
+### Requirement: common palette, every color optional
 
-The wrapper MUST accept every color as a `#RRGGBB` or `#RRGGBBAA` string and MUST treat each one as
-optional: only the colors given are applied.
+The wrapper MUST accept the colors that the iOS and Android SDKs share, each one optional: only the colors
+given are applied and the rest keep the SDK default.
+
+| Color | Name |
+|---|---|
+| Primary | `primaryColor` |
+| Secondary | `secondaryColor` |
+| Navigation bar | `navigationBarColor` |
+| Incoming message | `incomingMessageColor` |
+| Outgoing message | `outgoingMessageColor` |
 
 #### Scenario: apply a partial palette
 
@@ -19,34 +27,13 @@ optional: only the colors given are applied.
 - THEN the SDK screens use that primary color
 - AND every other color keeps the SDK default
 
-#### Scenario: ignore an invalid color
+#### Scenario: invalid color
 
-- WHEN a color is not a valid `#RRGGBB` / `#RRGGBBAA` string
-- THEN that color is ignored
-- AND the call still succeeds
+- WHEN a Capacitor color is not a `#RRGGBB` / `#RRGGBBAA` string
+- THEN the call fails with `<color> must be #RRGGBB or #RRGGBBAA`
 
-### Requirement: same palette on every platform
-
-The wrapper MUST accept the full palette on every platform and SHOULD apply each color the platform SDK
-supports, ignoring the rest.
-
-| Color | iOS | Android |
-|---|---|---|
-| Primary | yes | yes |
-| Secondary | yes | yes |
-| Navigation bar | yes | yes |
-| Incoming message | yes | yes |
-| Outgoing message | yes | yes |
-| Divider | yes | ignored |
-
-#### Scenario: platform-only color
-
-- WHEN the integrator sets the divider color on Android
-- THEN it is ignored
-- AND the call succeeds
-
-The native `ios/` and `android/` wrappers take one brand color and apply it to primary, secondary, navigation
-bar and outgoing message (iOS also takes a navigation bar logo).
+The native `ios/` sample also shows a logo in the navigation bar. For colors only one platform has, call the
+SDK directly from the `MeetingLawyersIntegration` file.
 
 ## Errors
 
@@ -58,7 +45,7 @@ bar and outgoing message (iOS also takes a navigation bar logo).
 
 | Sample | Where |
 |---|---|
-| `ios/` | `MeetingLawyersIntegration.configureTheme` (brand color and navigation logo) |
-| `android/` | `MeetingLawyersIntegration.configureTheme` (brand color), from `App.onCreate` |
-| `capacitor/` | `constants.ts` → `ML_THEME`, applied after configure |
+| `ios/` | `ViewController` → `configureTheme` (brand color and navigation logo) |
+| `android/` | `App.onCreate` → `configureTheme` (brand color) |
+| `capacitor/` | `Home.tsx` → `configureTheme` with `BRAND_COLOR`, after configure |
 | `flutter/` | `main.dart` → `brandColor`, applied after configure |

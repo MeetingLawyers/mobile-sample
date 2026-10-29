@@ -10,7 +10,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     /// Configures Firebase and takes over push delivery before any notification can arrive.
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
-        MeetingLawyersPlugin.startHandlingPushNotifications()
+        MeetingLawyersIntegration.shared.startHandlingPushNotifications()
         return true
     }
 

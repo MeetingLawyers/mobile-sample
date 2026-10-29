@@ -72,7 +72,8 @@ Register the service in `AndroidManifest.xml`:
 
 ```kotlin
 MeetingLawyersIntegration.configure(this, apiKey = "<your API key>", isProduction = false)
-MeetingLawyersIntegration.configureTheme(Color.parseColor("#2E7D6B"))
+// Every color is optional; the ones left out keep the SDK default
+MeetingLawyersIntegration.configureTheme(MeetingLawyersIntegration.Theme(primaryColor = Color.parseColor("#2E7D6B")))
 ```
 
 **4. Use it** from your screens:

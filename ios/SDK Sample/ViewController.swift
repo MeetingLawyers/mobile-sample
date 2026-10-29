@@ -42,7 +42,9 @@ final class ViewController: UIViewController {
         }
         do {
             try await integration.configure(apiKey: Constants.apiKey, isProduction: Constants.isProduction)
-            integration.configureTheme(color: Self.brandColor, logo: UIImage(named: "ml_logo"))
+            let theme = MeetingLawyersIntegration.Theme(primaryColor: Self.brandColor, secondaryColor: Self.brandColor,
+                                                        navigationBarColor: Self.brandColor, outgoingMessageColor: Self.brandColor)
+            integration.configureTheme(theme, logo: UIImage(named: "ml_logo"))
             status = integration.isAuthenticated ? .authenticated : .configured
         } catch {
             status = .missingCredentials

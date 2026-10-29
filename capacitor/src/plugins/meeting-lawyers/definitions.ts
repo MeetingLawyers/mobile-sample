@@ -3,8 +3,20 @@ export type MLEnvironment = 'DEV' | 'PROD';
 export interface ConfigureOptions {
   /** Company API key provided by MeetingLawyers. */
   apiKey: string;
-  /** Target backend. Defaults to 'PROD'. */
+  /** 'DEV' = demo environment. Defaults to 'PROD'. */
   environment?: MLEnvironment;
+}
+
+/**
+ * Colors of the SDK screens shared by iOS and Android, as '#RRGGBB' or '#RRGGBBAA'.
+ * Every color is optional; the ones left out keep the SDK default.
+ */
+export interface ThemeOptions {
+  primaryColor?: string;
+  secondaryColor?: string;
+  navigationBarColor?: string;
+  incomingMessageColor?: string;
+  outgoingMessageColor?: string;
 }
 
 export interface AuthenticateOptions {
@@ -13,7 +25,6 @@ export interface AuthenticateOptions {
 }
 
 export interface OpenChatOptions {
-  /** Professional hash, e.g. captured from a professional list selection. */
   professionalHash: string;
 }
 
@@ -22,54 +33,26 @@ export interface IsAuthenticatedResult {
 }
 
 /**
- * Theme colors as hex strings (`#RRGGBB` or `#RRGGBBAA`).
- * Every field is optional; each platform applies the colors its SDK supports
- * and ignores the rest, so you can set the full palette from one place.
- */
-export interface ThemeOptions {
-  /** Primary tint. iOS + Android. */
-  primaryColor?: string;
-  /** Secondary tint (e.g. list badge). iOS + Android. */
-  secondaryColor?: string;
-  /** Navigation bar color. iOS + Android. */
-  navigationBarColor?: string;
-  /** Incoming chat bubble color. iOS + Android. */
-  incomingMessageColor?: string;
-  /** Outgoing chat bubble color. iOS + Android. */
-  outgoingMessageColor?: string;
-  /** Divider background. iOS only. */
-  dividerColor?: string;
-}
-
-/**
- * Bridge to the native MeetingLawyers SDKs (iOS and Android).
+ * Bridge to the MeetingLawyers SDK.
  *
- * Native counterparts:
- * - iOS:     ios/App/App/MeetingLawyersPlugin.swift
- * - Android: android/app/src/main/java/com/meetinglawyers/sample/ionic/MeetingLawyersPlugin.java
- *            and MeetingLawyersFirebaseService.java (push)
- *
- * Copy those three native files plus this folder into your own Capacitor project
- * to integrate the SDK without spreading native imports.
+ * Native counterparts, the only code that imports the SDK:
+ * - iOS:     ios/App/App/MeetingLawyersPlugin.swift + MeetingLawyersIntegration.swift
+ * - Android: android/app/src/main/java/.../MeetingLawyersPlugin.kt + MeetingLawyersIntegration.kt
+ *            + MeetingLawyersMessagingService.kt
  */
 export interface MeetingLawyersPlugin {
-  /** Initializes the SDK. Call once at app startup, before any other method. */
+  /** Configures the SDK. Call it once at app startup, before any other method. */
   configure(options: ConfigureOptions): Promise<void>;
-  /** Applies the theme colors. Requires configure() first. */
+  /** Applies the theme colors. */
   configureTheme(options: ThemeOptions): Promise<void>;
-  /** Authenticates the user in the SDK. Requires configure() first. */
+  /** Signs the user in, asks for push permission and registers the push token. */
   authenticate(options: AuthenticateOptions): Promise<void>;
-  /** Opens the native professional list. Tapping a professional opens its chat. */
+  /** Opens the professional list. Tapping a professional opens its chat. */
   openProfessionalList(): Promise<void>;
-  /** Opens the chat with a specific professional. */
-  openChatWithProfessional(options: OpenChatOptions): Promise<void>;
-  /**
-   * Asks for notification permission and registers the device FCM token with
-   * the SDK. Call it right after authenticate() so the token is linked to the user.
-   */
-  registerForPushNotifications(): Promise<void>;
-  /** Whether a user is currently authenticated in the SDK. */
+  /** Opens the chat with a professional. */
+  openChat(options: OpenChatOptions): Promise<void>;
+  /** True while a user is signed in. */
   isAuthenticated(): Promise<IsAuthenticatedResult>;
-  /** Logs the user out of the SDK. */
+  /** Signs the user out. */
   logout(): Promise<void>;
 }
