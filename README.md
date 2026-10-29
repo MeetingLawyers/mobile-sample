@@ -30,11 +30,11 @@ and is published as a [release](../../releases).
 | Sample | SDKs | Requirements |
 |---|---|---|
 | `ios/` | iOS 2.2.1 | Xcode 26+, iOS 15+ |
-| `android/` | Android 2.1.15 | Android Studio, JDK 17+, minSdk 23, compileSdk 36 |
-| `capacitor/` | iOS 2.2.1 · Android 2.1.15 | Node 22+, Capacitor 8, Xcode 26+, iOS 15+, minSdk 24 |
-| `flutter/` | iOS 2.2.1 · Android 2.1.15 | Flutter 3.47+, Xcode 26+, iOS 15+, minSdk 24 |
+| `android/` | Android 2.1.16 | Android Studio, JDK 17+, minSdk 23, compileSdk 36 |
+| `capacitor/` | iOS 2.2.1 · Android 2.1.16 | Node 22+, Capacitor 8, Xcode 26+, iOS 15+, minSdk 24 |
+| `flutter/` | iOS 2.2.1 · Android 2.1.16 | Flutter 3.47+, Xcode 26+, iOS 15+, minSdk 24 |
 | `meetingpros/ios/` | iOS 2.2.1 + MeetingDoctors 11.6.3 | Xcode 26+, iOS 15+ |
-| `meetingpros/android/` | Android 2.1.15 + MeetingDoctors chat 2.9.0, video call 3.0.22 | Android Studio, JDK 17+, minSdk 24, compileSdk 36 |
+| `meetingpros/android/` | Android 2.1.16 + MeetingDoctors chat 2.9.0, video call 3.0.22 | Android Studio, JDK 17+, minSdk 24, compileSdk 36 |
 | `meetingpros/capacitor/` | Same as `meetingpros/ios/` and `meetingpros/android/` | Node 22+, Capacitor 8, Xcode 26+, iOS 15+, minSdk 24 |
 | `meetingpros/flutter/` | Same as `meetingpros/ios/` and `meetingpros/android/` | Flutter 3.47+, Xcode 26+, iOS 15+, minSdk 24 |
 
