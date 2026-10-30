@@ -31,12 +31,12 @@ final class MeetingLawyersChannel: NSObject, FlutterPlugin {
             try await integration.configure(apiKey: try Self.required("apiKey", in: arguments),
                                             isProduction: arguments["isProduction"] as? Bool ?? true)
         case "configureTheme":
-            integration.configureTheme(MeetingLawyersIntegration.Theme(
-                primaryColor: Self.color(arguments["primaryColor"]),
-                secondaryColor: Self.color(arguments["secondaryColor"]),
-                navigationBarColor: Self.color(arguments["navigationBarColor"]),
-                incomingMessageColor: Self.color(arguments["incomingMessageColor"]),
-                outgoingMessageColor: Self.color(arguments["outgoingMessageColor"])
+            try integration.configureTheme(MeetingLawyersIntegration.Theme(
+                primaryColor: arguments["primaryColor"] as? String,
+                secondaryColor: arguments["secondaryColor"] as? String,
+                navigationBarColor: arguments["navigationBarColor"] as? String,
+                incomingMessageColor: arguments["incomingMessageColor"] as? String,
+                outgoingMessageColor: arguments["outgoingMessageColor"] as? String
             ))
         case "authenticate":
             try await integration.authenticate(userId: try Self.required("userId", in: arguments))
@@ -69,13 +69,6 @@ final class MeetingLawyersChannel: NSObject, FlutterPlugin {
     private static func required(_ name: String, in arguments: [String: Any]) throws -> String {
         guard let value = arguments[name] as? String, !value.isEmpty else { throw ChannelError.invalidArgument(name) }
         return value
-    }
-
-    /// Converts a Dart 0xAARRGGBB color; nil when the argument is missing.
-    private static func color(_ value: Any?) -> UIColor? {
-        guard let argb = value as? Int else { return nil }
-        return UIColor(red: CGFloat((argb >> 16) & 0xFF) / 255, green: CGFloat((argb >> 8) & 0xFF) / 255,
-                       blue: CGFloat(argb & 0xFF) / 255, alpha: CGFloat((argb >> 24) & 0xFF) / 255)
     }
 }
 

@@ -9,9 +9,13 @@ final class MeetingLawyersIntegration: NSObject {
 
     enum IntegrationError: LocalizedError {
         case professionalListUnavailable
+        case invalidColor(String)
 
         var errorDescription: String? {
-            "Could not create the professional list. Configure and authenticate first."
+            switch self {
+            case .professionalListUnavailable: "Could not create the professional list. Configure and authenticate first."
+            case .invalidColor(let name): "\(name) must be #RRGGBB or #RRGGBBAA"
+            }
         }
     }
 
@@ -25,28 +29,45 @@ final class MeetingLawyersIntegration: NSObject {
         try await MeetingLawyersApp.configure(configuration)
     }
 
-    /// Colors of the SDK screens shared by iOS and Android; a nil color keeps the SDK default.
+    /// Colors of the SDK screens shared by iOS and Android, as "#RRGGBB" or "#RRGGBBAA"; a nil color keeps the SDK default.
     struct Theme {
-        var primaryColor: UIColor?
-        var secondaryColor: UIColor?
-        var navigationBarColor: UIColor?
-        var incomingMessageColor: UIColor?
-        var outgoingMessageColor: UIColor?
+        var primaryColor: String?
+        var secondaryColor: String?
+        var navigationBarColor: String?
+        var incomingMessageColor: String?
+        var outgoingMessageColor: String?
     }
 
-    /// Applies the theme colors and, if given, shows the logo in the navigation bar.
+    /// Applies the theme colors and, if given, shows the logo in the navigation bar; throws on an invalid color.
     @MainActor
-    func configureTheme(_ theme: Theme, logo: UIImage? = nil) {
-        if let color = theme.primaryColor { MeetingLawyersApp.setStyle(primaryColor: color) }
-        if let color = theme.secondaryColor { MeetingLawyersApp.setStyle(secondaryColor: color) }
-        if let color = theme.navigationBarColor { MeetingLawyersApp.setStyle(navigationColor: color) }
-        if let color = theme.incomingMessageColor { MeetingLawyersApp.setStyle(incomingBubbleColor: color) }
-        if let color = theme.outgoingMessageColor { MeetingLawyersApp.setStyle(outgoingBubbleColor: color) }
+    func configureTheme(_ theme: Theme, logo: UIImage? = nil) throws {
+        let primary = try Self.color("primaryColor", theme.primaryColor)
+        let secondary = try Self.color("secondaryColor", theme.secondaryColor)
+        let navigationBar = try Self.color("navigationBarColor", theme.navigationBarColor)
+        let incomingMessage = try Self.color("incomingMessageColor", theme.incomingMessageColor)
+        let outgoingMessage = try Self.color("outgoingMessageColor", theme.outgoingMessageColor)
+        if let primary { MeetingLawyersApp.setStyle(primaryColor: primary) }
+        if let secondary { MeetingLawyersApp.setStyle(secondaryColor: secondary) }
+        if let navigationBar { MeetingLawyersApp.setStyle(navigationColor: navigationBar) }
+        if let incomingMessage { MeetingLawyersApp.setStyle(incomingBubbleColor: incomingMessage) }
+        if let outgoingMessage { MeetingLawyersApp.setStyle(outgoingBubbleColor: outgoingMessage) }
         guard let logo else { return }
         let logoView = UIImageView(image: logo)
         logoView.contentMode = .scaleAspectFit
         logoView.frame = CGRect(x: 0, y: 0, width: 150, height: 32)
         MeetingLawyersApp.setStyle(navigationTitleView: logoView)
+    }
+
+    /// Parses a "#RRGGBB" or "#RRGGBBAA" color; nil when not given.
+    private static func color(_ name: String, _ hex: String?) throws -> UIColor? {
+        guard let hex else { return nil }
+        let value = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
+        guard value.count == 6 || value.count == 8, value.allSatisfy(\.isHexDigit), let parsed = UInt64(value, radix: 16) else {
+            throw IntegrationError.invalidColor(name)
+        }
+        let rgba = value.count == 6 ? (parsed << 8) | 0xFF : parsed
+        return UIColor(red: CGFloat((rgba >> 24) & 0xFF) / 255, green: CGFloat((rgba >> 16) & 0xFF) / 255,
+                       blue: CGFloat((rgba >> 8) & 0xFF) / 255, alpha: CGFloat(rgba & 0xFF) / 255)
     }
 
     /// Signs the user in, then asks for push permission and links this device's token to them.

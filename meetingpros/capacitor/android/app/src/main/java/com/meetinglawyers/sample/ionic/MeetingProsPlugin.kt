@@ -3,7 +3,6 @@ package com.meetinglawyers.sample.ionic
 import android.Manifest
 import android.app.Application
 import android.content.Context
-import android.graphics.Color
 import android.os.Build
 import androidx.core.content.edit
 import com.getcapacitor.JSArray
@@ -64,8 +63,7 @@ class MeetingProsPlugin : Plugin() {
     /** Applies the brand color to both SDKs. */
     @PluginMethod
     fun configureTheme(call: PluginCall) {
-        val color = parseColor(call.getString("primaryColor")) ?: return call.reject("primaryColor must be #RRGGBB or #RRGGBBAA")
-        run(call) { integration.configureTheme(color) }
+        run(call) { integration.configureTheme(call.getString("primaryColor").orEmpty()) }
     }
 
     /** Signs the user into both SDKs, then asks for the notification permission on Android 13+. */
@@ -145,17 +143,6 @@ class MeetingProsPlugin : Plugin() {
                 .onSuccess { call.resolve() }
                 .onFailure { call.reject(it.message ?: it.toString()) }
         }
-    }
-
-    /** Parses a "#RRGGBB" or "#RRGGBBAA" hex string into an ARGB int. */
-    private fun parseColor(hex: String?): Int? {
-        val value = hex?.removePrefix("#")?.trim() ?: return null
-        val argb = when (value.length) {
-            6 -> "FF$value"
-            8 -> value.takeLast(2) + value.take(6)
-            else -> return null
-        }
-        return runCatching { Color.parseColor("#$argb") }.getOrNull()
     }
 
     companion object {

@@ -9,6 +9,7 @@ final class ViewController: UIViewController {
         case authenticated = "Authenticated"
     }
 
+    private static let brandHex = "#2E7D6B"
     private static let brandColor = UIColor(red: 0x2E / 255, green: 0x7D / 255, blue: 0x6B / 255, alpha: 1)
 
     private let integration = MeetingLawyersIntegration.shared
@@ -42,9 +43,9 @@ final class ViewController: UIViewController {
         }
         do {
             try await integration.configure(apiKey: Constants.apiKey, isProduction: Constants.isProduction)
-            let theme = MeetingLawyersIntegration.Theme(primaryColor: Self.brandColor, secondaryColor: Self.brandColor,
-                                                        navigationBarColor: Self.brandColor, outgoingMessageColor: Self.brandColor)
-            integration.configureTheme(theme, logo: UIImage(named: "ml_logo"))
+            let theme = MeetingLawyersIntegration.Theme(primaryColor: Self.brandHex, secondaryColor: Self.brandHex,
+                                                        navigationBarColor: Self.brandHex, outgoingMessageColor: Self.brandHex)
+            try integration.configureTheme(theme, logo: UIImage(named: "ml_logo"))
             status = integration.isAuthenticated ? .authenticated : .configured
         } catch {
             status = .missingCredentials

@@ -85,7 +85,7 @@ MeetingProsIntegration.configure(
     this, lawyersApiKey = "<lawyers key>", doctorsApiKey = "<doctors key>",
     isProduction = false, pushActivity = MainActivity::class.java,
 )
-MeetingProsIntegration.configureTheme(Color.parseColor("#2E7D6B"))
+MeetingProsIntegration.configureTheme("#2E7D6B")
 ```
 
 With `isProduction = false` lawyers use the demo environment and doctors the staging one. `configure` blocks

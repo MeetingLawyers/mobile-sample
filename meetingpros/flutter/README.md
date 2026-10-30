@@ -77,7 +77,7 @@ Then:
 import 'meeting_pros/meeting_pros.dart';
 
 await MeetingPros.configure(lawyersApiKey: lawyersKey, doctorsApiKey: doctorsKey, isProduction: false); // demo + staging
-await MeetingPros.configureTheme(0xFF2E7D6B);
+await MeetingPros.configureTheme('#2E7D6B');
 await MeetingPros.authenticate(userId);                 // both SDKs, plus push permission and token
 await MeetingPros.openProfessionalList(ProfessionalType.vets); // lawyers, doctors or vets
 await MeetingPros.openLawyerChat(professionalHash);

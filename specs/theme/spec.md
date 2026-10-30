@@ -10,8 +10,8 @@ Applies the integrator's brand colors to the SDK screens from one place.
 
 ### Requirement: common palette, every color optional
 
-The wrapper MUST accept the colors that the iOS and Android SDKs share, each one optional: only the colors
-given are applied and the rest keep the SDK default.
+The wrapper MUST accept the colors that the iOS and Android SDKs share, each one optional, as `#RRGGBB` or
+`#RRGGBBAA` hex strings on every platform: only the colors given are applied and the rest keep the SDK default.
 
 | Color | Name |
 |---|---|
@@ -29,8 +29,9 @@ given are applied and the rest keep the SDK default.
 
 #### Scenario: invalid color
 
-- WHEN a Capacitor color is not a `#RRGGBB` / `#RRGGBBAA` string
+- WHEN a color is not a `#RRGGBB` / `#RRGGBBAA` string
 - THEN the call fails with `<color> must be #RRGGBB or #RRGGBBAA`
+- AND no color is applied
 
 The native `ios/` sample also shows a logo in the navigation bar. For colors only one platform has, call the
 SDK directly from the `MeetingLawyersIntegration` file.

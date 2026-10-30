@@ -39,7 +39,7 @@ forward the ones it does not own from your delegate.
 ```swift
 let integration = MeetingProsIntegration.shared
 try await integration.configure(lawyersApiKey: "<lawyers key>", doctorsApiKey: "<doctors key>", isProduction: false)
-integration.configureTheme(color: .systemTeal, logo: UIImage(named: "logo"))
+try integration.configureTheme(primaryColor: "#2E7D6B", logo: UIImage(named: "logo"))
 try await integration.authenticate(userId: "<user id>")       // both SDKs; also asks for push permission
 try integration.openProfessionalList(.doctors, in: navigationController)   // .lawyers, .doctors or .vets
 try await integration.openLawyerChat(professionalHash: hash, from: viewController)

@@ -69,7 +69,7 @@ Then:
 import 'meeting_lawyers/meeting_lawyers.dart';
 
 await MeetingLawyers.configure(apiKey: apiKey, isProduction: false); // demo environment
-await MeetingLawyers.configureTheme(primaryColor: 0xFF1E5AA8); // every color optional
+await MeetingLawyers.configureTheme(primaryColor: '#1E5AA8'); // hex, every color optional
 await MeetingLawyers.authenticate(userId);   // plus push permission and token
 await MeetingLawyers.openProfessionalList(); // tap a professional to chat
 await MeetingLawyers.openChat(professionalHash);
