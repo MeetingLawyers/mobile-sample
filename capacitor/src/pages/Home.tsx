@@ -15,7 +15,7 @@ import {
 import { chatbubblesOutline, logInOutline, logOutOutline, peopleOutline } from 'ionicons/icons';
 
 import { MeetingLawyers } from '../plugins/meeting-lawyers';
-import { ML_API_KEY, ML_ENVIRONMENT, ML_THEME, ML_USER_ID } from '../config/constants';
+import { BRAND_COLOR, ML_API_KEY, ML_ENVIRONMENT, ML_USER_ID } from '../config/constants';
 import './Home.css';
 
 type SdkStatus = 'missing-credentials' | 'configuring' | 'configured' | 'authenticated';
@@ -37,7 +37,12 @@ const Home: React.FC = () => {
     try {
       setError(null);
       await MeetingLawyers.configure({ apiKey: ML_API_KEY, environment: ML_ENVIRONMENT });
-      await MeetingLawyers.configureTheme(ML_THEME);
+      await MeetingLawyers.configureTheme({
+        primaryColor: BRAND_COLOR,
+        secondaryColor: BRAND_COLOR,
+        navigationBarColor: BRAND_COLOR,
+        outgoingMessageColor: BRAND_COLOR,
+      });
       const { authenticated } = await MeetingLawyers.isAuthenticated();
       setStatus(authenticated ? 'authenticated' : 'configured');
     } catch (e) {
@@ -51,8 +56,6 @@ const Home: React.FC = () => {
       setError(null);
       await MeetingLawyers.authenticate({ userId: ML_USER_ID });
       setStatus('authenticated');
-      // Asks for push permission and links the token to the user; a push failure never blocks sign-in.
-      MeetingLawyers.registerForPushNotifications().catch(() => undefined);
     } catch (e) {
       setError(describe(e));
     }
@@ -70,7 +73,7 @@ const Home: React.FC = () => {
   const openChat = async () => {
     try {
       setError(null);
-      await MeetingLawyers.openChatWithProfessional({ professionalHash });
+      await MeetingLawyers.openChat({ professionalHash });
     } catch (e) {
       setError(describe(e));
     }

@@ -44,7 +44,7 @@ android {
 
 dependencies {
     // sample dependencies
-    implementation("com.meetinglawyers:sdk:2.1.15")
+    implementation("com.meetinglawyers:sdk:2.1.16")
     implementation("com.meetingdoctors:customer-chat-sdk:2.9.0")
     implementation("com.meetingdoctors:videocall-sdk:3.0.22")
     implementation("com.meetingdoctors:meetingdoctors-security-sdk:1.1.0")

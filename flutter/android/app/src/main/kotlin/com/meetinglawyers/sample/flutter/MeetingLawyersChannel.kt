@@ -34,7 +34,13 @@ class MeetingLawyersChannel private constructor(private val activity: Activity) 
                 result.success(null)
             }
             "configureTheme" -> {
-                integration.configureTheme(call.argument<Number>("color")?.toInt() ?: 0)
+                fun color(name: String) = call.argument<Number>(name)?.toInt()
+                integration.configureTheme(
+                    MeetingLawyersIntegration.Theme(
+                        color("primaryColor"), color("secondaryColor"), color("navigationBarColor"),
+                        color("incomingMessageColor"), color("outgoingMessageColor"),
+                    ),
+                )
                 result.success(null)
             }
             "authenticate" -> integration.authenticate(

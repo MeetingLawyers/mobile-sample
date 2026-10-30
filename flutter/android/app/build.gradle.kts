@@ -45,7 +45,7 @@ flutter {
 }
 
 dependencies {
-    implementation("com.meetinglawyers:sdk:2.1.15")
+    implementation("com.meetinglawyers:sdk:2.1.16")
     implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
     implementation("com.google.firebase:firebase-messaging")
 }

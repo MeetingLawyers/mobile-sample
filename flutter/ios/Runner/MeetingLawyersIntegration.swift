@@ -25,13 +25,24 @@ final class MeetingLawyersIntegration: NSObject {
         try await MeetingLawyersApp.configure(configuration)
     }
 
-    /// Applies the brand color to every themable element and shows the logo in the navigation bar.
+    /// Colors of the SDK screens shared by iOS and Android; a nil color keeps the SDK default.
+    struct Theme {
+        var primaryColor: UIColor?
+        var secondaryColor: UIColor?
+        var navigationBarColor: UIColor?
+        var incomingMessageColor: UIColor?
+        var outgoingMessageColor: UIColor?
+    }
+
+    /// Applies the theme colors and, if given, shows the logo in the navigation bar.
     @MainActor
-    func configureTheme(color: UIColor, logo: UIImage?) {
-        MeetingLawyersApp.setStyle(primaryColor: color)
-        MeetingLawyersApp.setStyle(secondaryColor: color)
-        MeetingLawyersApp.setStyle(navigationColor: color)
-        MeetingLawyersApp.setStyle(outgoingBubbleColor: color)
+    func configureTheme(_ theme: Theme, logo: UIImage? = nil) {
+        if let color = theme.primaryColor { MeetingLawyersApp.setStyle(primaryColor: color) }
+        if let color = theme.secondaryColor { MeetingLawyersApp.setStyle(secondaryColor: color) }
+        if let color = theme.navigationBarColor { MeetingLawyersApp.setStyle(navigationColor: color) }
+        if let color = theme.incomingMessageColor { MeetingLawyersApp.setStyle(incomingBubbleColor: color) }
+        if let color = theme.outgoingMessageColor { MeetingLawyersApp.setStyle(outgoingBubbleColor: color) }
+        guard let logo else { return }
         let logoView = UIImageView(image: logo)
         logoView.contentMode = .scaleAspectFit
         logoView.frame = CGRect(x: 0, y: 0, width: 150, height: 32)

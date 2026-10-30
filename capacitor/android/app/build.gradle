@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
     namespace = "com.meetinglawyers.sample.ionic"
@@ -21,6 +22,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    kotlinOptions {
+        jvmTarget = '21'
+    }
 }
 
 repositories {
@@ -31,7 +35,7 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "com.meetinglawyers:sdk:2.1.15"
+    implementation "com.meetinglawyers:sdk:2.1.16"
     // Same BoM the MeetingLawyers SDK is built against.
     implementation platform("com.google.firebase:firebase-bom:32.7.1")
     implementation "com.google.firebase:firebase-messaging"

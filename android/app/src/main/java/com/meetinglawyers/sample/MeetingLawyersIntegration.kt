@@ -33,12 +33,22 @@ object MeetingLawyersIntegration {
         MeetingLawyersSDK(application, apiKey, buildMode, Locale.getDefault(), logMode).build()
     }
 
-    /** Applies the brand color to every themable element. */
-    fun configureTheme(color: Int) {
-        client.setPrimaryColor(color)
-        client.setSecondaryColor(color)
-        client.setNavigationBarColor(color)
-        client.setOngoingMessageBgColor(color)
+    /** Colors of the SDK screens shared by iOS and Android, as ARGB ints; a null color keeps the SDK default. */
+    data class Theme(
+        val primaryColor: Int? = null,
+        val secondaryColor: Int? = null,
+        val navigationBarColor: Int? = null,
+        val incomingMessageColor: Int? = null,
+        val outgoingMessageColor: Int? = null,
+    )
+
+    /** Applies the theme colors. */
+    fun configureTheme(theme: Theme) {
+        theme.primaryColor?.let { client.setPrimaryColor(it) }
+        theme.secondaryColor?.let { client.setSecondaryColor(it) }
+        theme.navigationBarColor?.let { client.setNavigationBarColor(it) }
+        theme.incomingMessageColor?.let { client.setIncomingMessageBgColor(it) }
+        theme.outgoingMessageColor?.let { client.setOngoingMessageBgColor(it) }
     }
 
     /** Signs the user in and links this device's push token to them; `onResult` gets the error, or null, on the main thread. */

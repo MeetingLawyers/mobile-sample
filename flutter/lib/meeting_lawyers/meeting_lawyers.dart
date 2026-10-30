@@ -11,8 +11,21 @@ class MeetingLawyers {
   static Future<void> configure({required String apiKey, required bool isProduction}) =>
       _channel.invokeMethod('configure', {'apiKey': apiKey, 'isProduction': isProduction});
 
-  /// Applies the brand color (0xAARRGGBB).
-  static Future<void> configureTheme(int color) => _channel.invokeMethod('configureTheme', {'color': color});
+  /// Applies the theme colors (0xAARRGGBB). Every color is optional; the ones left out keep the SDK default.
+  static Future<void> configureTheme({
+    int? primaryColor,
+    int? secondaryColor,
+    int? navigationBarColor,
+    int? incomingMessageColor,
+    int? outgoingMessageColor,
+  }) =>
+      _channel.invokeMethod('configureTheme', {
+        'primaryColor': primaryColor,
+        'secondaryColor': secondaryColor,
+        'navigationBarColor': navigationBarColor,
+        'incomingMessageColor': incomingMessageColor,
+        'outgoingMessageColor': outgoingMessageColor,
+      });
 
   /// Signs the user in, asks for push permission and registers the push token.
   static Future<void> authenticate(String userId) => _channel.invokeMethod('authenticate', {'userId': userId});

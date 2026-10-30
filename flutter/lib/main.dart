@@ -50,7 +50,13 @@ class _HomePageState extends State<HomePage> {
     }
     await _run(() async {
       await MeetingLawyers.configure(apiKey: apiKey, isProduction: isProduction);
-      await MeetingLawyers.configureTheme(brandColor.toARGB32());
+      final color = brandColor.toARGB32();
+      await MeetingLawyers.configureTheme(
+        primaryColor: color,
+        secondaryColor: color,
+        navigationBarColor: color,
+        outgoingMessageColor: color,
+      );
       final signedIn = await MeetingLawyers.isAuthenticated();
       setState(() => _status = signedIn ? Status.authenticated : Status.configured);
     });

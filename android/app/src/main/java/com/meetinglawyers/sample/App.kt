@@ -8,7 +8,12 @@ class App : Application() {
         super.onCreate()
         if (Constants.apiKey.isNotEmpty()) {
             MeetingLawyersIntegration.configure(this, Constants.apiKey, Constants.isProduction)
-            MeetingLawyersIntegration.configureTheme(Constants.brandColor)
+            val color = Constants.brandColor
+            MeetingLawyersIntegration.configureTheme(
+                MeetingLawyersIntegration.Theme(
+                    primaryColor = color, secondaryColor = color, navigationBarColor = color, outgoingMessageColor = color,
+                ),
+            )
         }
     }
 }

@@ -51,7 +51,7 @@ The `google-services` (4.4.4) and `firebase-crashlytics` (2.9.9) plugins (declar
 applied in `app/build.gradle.kts`), `minSdk = 24`, and the dependencies in `app/build.gradle.kts`:
 
 ```kotlin
-implementation("com.meetinglawyers:sdk:2.1.15")
+implementation("com.meetinglawyers:sdk:2.1.16")
 implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
 implementation("com.google.firebase:firebase-messaging")
 ```
@@ -69,7 +69,7 @@ Then:
 import 'meeting_lawyers/meeting_lawyers.dart';
 
 await MeetingLawyers.configure(apiKey: apiKey, isProduction: false); // demo environment
-await MeetingLawyers.configureTheme(0xFF1E5AA8);
+await MeetingLawyers.configureTheme(primaryColor: 0xFF1E5AA8); // every color optional
 await MeetingLawyers.authenticate(userId);   // plus push permission and token
 await MeetingLawyers.openProfessionalList(); // tap a professional to chat
 await MeetingLawyers.openChat(professionalHash);
