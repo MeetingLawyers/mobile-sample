@@ -108,8 +108,9 @@ object MeetingProsIntegration {
         VideoCallClient.returnIntent = Intent(application, pushActivity).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
     }
 
-    /** Applies the brand color to both SDKs. */
-    fun configureTheme(color: Int) {
+    /** Applies the brand color ("#RRGGBB" or "#RRGGBBAA") to both SDKs; throws `IllegalArgumentException` on an invalid color. */
+    fun configureTheme(primaryColor: String) {
+        val color = color("primaryColor", primaryColor)
         lawyers.setPrimaryColor(color)
         lawyers.setSecondaryColor(color)
         lawyers.setNavigationBarColor(color)
@@ -121,6 +122,17 @@ object MeetingProsIntegration {
             setUnreadBadgeProfessionalColor(color)
             setOutgoingMessageBgColor(color)
         }
+    }
+
+    /** Parses a "#RRGGBB" or "#RRGGBBAA" color into an ARGB int. */
+    private fun color(name: String, hex: String): Int {
+        val value = hex.removePrefix("#")
+        val argb = when (value.length) {
+            6 -> "FF$value"
+            8 -> value.takeLast(2) + value.take(6)
+            else -> null
+        }
+        return requireNotNull(argb?.toLongOrNull(16)?.toInt()) { "$name must be #RRGGBB or #RRGGBBAA" }
     }
 
     /** Signs the same user into both SDKs, MeetingLawyers first, and links this device's push token. */

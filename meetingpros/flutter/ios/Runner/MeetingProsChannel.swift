@@ -39,7 +39,7 @@ final class MeetingProsChannel: NSObject, FlutterPlugin {
                                             doctorsApiKey: arguments["doctorsApiKey"] as? String ?? "",
                                             isProduction: arguments["isProduction"] as? Bool ?? true)
         case "configureTheme":
-            integration.configureTheme(color: Self.color(arguments["color"] as? Int ?? 0), logo: nil)
+            try integration.configureTheme(primaryColor: arguments["primaryColor"] as? String ?? "", logo: nil)
         case "authenticate":
             try await integration.authenticate(userId: arguments["userId"] as? String ?? "")
         case "openProfessionalList":
@@ -73,12 +73,6 @@ final class MeetingProsChannel: NSObject, FlutterPlugin {
             .first
         guard let navigationController = root as? UINavigationController else { throw ChannelError.navigationUnavailable }
         return navigationController
-    }
-
-    /// Converts a Dart 0xAARRGGBB color.
-    private static func color(_ argb: Int) -> UIColor {
-        UIColor(red: CGFloat((argb >> 16) & 0xFF) / 255, green: CGFloat((argb >> 8) & 0xFF) / 255,
-                blue: CGFloat(argb & 0xFF) / 255, alpha: CGFloat((argb >> 24) & 0xFF) / 255)
     }
 }
 

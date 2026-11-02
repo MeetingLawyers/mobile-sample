@@ -33,22 +33,39 @@ object MeetingLawyersIntegration {
         MeetingLawyersSDK(application, apiKey, buildMode, Locale.getDefault(), logMode).build()
     }
 
-    /** Colors of the SDK screens shared by iOS and Android, as ARGB ints; a null color keeps the SDK default. */
+    /** Colors of the SDK screens shared by iOS and Android, as "#RRGGBB" or "#RRGGBBAA"; a null color keeps the SDK default. */
     data class Theme(
-        val primaryColor: Int? = null,
-        val secondaryColor: Int? = null,
-        val navigationBarColor: Int? = null,
-        val incomingMessageColor: Int? = null,
-        val outgoingMessageColor: Int? = null,
+        val primaryColor: String? = null,
+        val secondaryColor: String? = null,
+        val navigationBarColor: String? = null,
+        val incomingMessageColor: String? = null,
+        val outgoingMessageColor: String? = null,
     )
 
-    /** Applies the theme colors. */
+    /** Applies the theme colors; throws `IllegalArgumentException` on an invalid color. */
     fun configureTheme(theme: Theme) {
-        theme.primaryColor?.let { client.setPrimaryColor(it) }
-        theme.secondaryColor?.let { client.setSecondaryColor(it) }
-        theme.navigationBarColor?.let { client.setNavigationBarColor(it) }
-        theme.incomingMessageColor?.let { client.setIncomingMessageBgColor(it) }
-        theme.outgoingMessageColor?.let { client.setOngoingMessageBgColor(it) }
+        val primary = color("primaryColor", theme.primaryColor)
+        val secondary = color("secondaryColor", theme.secondaryColor)
+        val navigationBar = color("navigationBarColor", theme.navigationBarColor)
+        val incomingMessage = color("incomingMessageColor", theme.incomingMessageColor)
+        val outgoingMessage = color("outgoingMessageColor", theme.outgoingMessageColor)
+        primary?.let { client.setPrimaryColor(it) }
+        secondary?.let { client.setSecondaryColor(it) }
+        navigationBar?.let { client.setNavigationBarColor(it) }
+        incomingMessage?.let { client.setIncomingMessageBgColor(it) }
+        outgoingMessage?.let { client.setOngoingMessageBgColor(it) }
+    }
+
+    /** Parses a "#RRGGBB" or "#RRGGBBAA" color into an ARGB int; null when not given. */
+    private fun color(name: String, hex: String?): Int? {
+        hex ?: return null
+        val value = hex.removePrefix("#")
+        val argb = when (value.length) {
+            6 -> "FF$value"
+            8 -> value.takeLast(2) + value.take(6)
+            else -> null
+        }
+        return requireNotNull(argb?.toLongOrNull(16)?.toInt()) { "$name must be #RRGGBB or #RRGGBBAA" }
     }
 
     /** Signs the user in and links this device's push token to them; `onResult` gets the error, or null, on the main thread. */

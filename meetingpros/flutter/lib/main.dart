@@ -9,6 +9,7 @@ const doctorsApiKey = String.fromEnvironment('MD_API_KEY');
 const userId = String.fromEnvironment('ML_USER_ID');
 const isProduction = String.fromEnvironment('ML_ENVIRONMENT') == 'PROD';
 const brandColor = Color(0xFF2E7D6B);
+const brandHex = '#2E7D6B';
 
 void main() => runApp(const SampleApp());
 
@@ -52,7 +53,7 @@ class _HomePageState extends State<HomePage> {
     }
     await _run(() async {
       await MeetingPros.configure(lawyersApiKey: lawyersApiKey, doctorsApiKey: doctorsApiKey, isProduction: isProduction);
-      await MeetingPros.configureTheme(brandColor.toARGB32());
+      await MeetingPros.configureTheme(brandHex);
       if (await MeetingPros.isAuthenticated()) {
         await _signedIn();
       } else {

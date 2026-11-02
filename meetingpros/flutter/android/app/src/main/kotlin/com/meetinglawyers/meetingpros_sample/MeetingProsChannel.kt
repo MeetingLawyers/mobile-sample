@@ -44,7 +44,7 @@ class MeetingProsChannel private constructor(private val activity: FragmentActiv
                 call.argument<String>("doctorsApiKey").orEmpty(), call.argument<Boolean>("isProduction") ?: true,
                 pushActivity = activity.javaClass,
             )
-            "configureTheme" -> integration.configureTheme(call.argument<Number>("color")?.toInt() ?: 0)
+            "configureTheme" -> integration.configureTheme(call.argument<String>("primaryColor").orEmpty())
             "authenticate" -> {
                 integration.authenticate(requireNotNull(call.argument<String>("userId")) { "userId is required" })
                 requestNotificationPermission()

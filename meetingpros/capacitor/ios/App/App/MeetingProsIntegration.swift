@@ -21,12 +21,14 @@ final class MeetingProsIntegration: NSObject {
         case doctorsApiKeyRequired
         case lawyersListUnavailable
         case featureUnavailable(DoctorsFeature)
+        case invalidColor(String)
 
         var errorDescription: String? {
             switch self {
             case .doctorsApiKeyRequired: "doctorsApiKey is required"
             case .lawyersListUnavailable: "Could not create the lawyers list. Configure and authenticate first."
             case .featureUnavailable(let feature): "\(feature) is not available"
+            case .invalidColor(let name): "\(name) must be #RRGGBB or #RRGGBBAA"
             }
         }
     }
@@ -55,9 +57,10 @@ final class MeetingProsIntegration: NSObject {
         isConfigured = true
     }
 
-    /// Applies the brand color to both SDKs and shows the logo in the lawyers navigation bar.
+    /// Applies the brand color ("#RRGGBB" or "#RRGGBBAA") to both SDKs and shows the logo in the lawyers navigation bar.
     @MainActor
-    func configureTheme(color: UIColor, logo: UIImage?) {
+    func configureTheme(primaryColor: String, logo: UIImage?) throws {
+        let color = try Self.color("primaryColor", primaryColor)
         MeetingLawyersApp.setStyle(primaryColor: color)
         MeetingLawyersApp.setStyle(secondaryColor: color)
         MeetingLawyersApp.setStyle(navigationColor: color)
@@ -75,6 +78,17 @@ final class MeetingProsIntegration: NSObject {
         // The app asks for the notification permission itself.
         MeetingDoctors.style.flags.common.showNotificationPermission = false
         MeetingDoctors.updateStyle()
+    }
+
+    /// Parses a "#RRGGBB" or "#RRGGBBAA" color.
+    private static func color(_ name: String, _ hex: String) throws -> UIColor {
+        let value = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
+        guard value.count == 6 || value.count == 8, value.allSatisfy(\.isHexDigit), let parsed = UInt64(value, radix: 16) else {
+            throw IntegrationError.invalidColor(name)
+        }
+        let rgba = value.count == 6 ? (parsed << 8) | 0xFF : parsed
+        return UIColor(red: CGFloat((rgba >> 24) & 0xFF) / 255, green: CGFloat((rgba >> 16) & 0xFF) / 255,
+                       blue: CGFloat((rgba >> 8) & 0xFF) / 255, alpha: CGFloat(rgba & 0xFF) / 255)
     }
 
     /// Signs the same user into both SDKs, then asks for push permission and registers the token.

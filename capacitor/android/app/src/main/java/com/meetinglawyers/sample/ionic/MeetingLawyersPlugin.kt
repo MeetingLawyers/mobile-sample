@@ -44,15 +44,11 @@ class MeetingLawyersPlugin : Plugin() {
     /** Applies the theme colors; every color is optional. */
     @PluginMethod
     fun configureTheme(call: PluginCall) {
-        val colors = THEME_COLORS.associateWith { name ->
-            val hex = call.getString(name) ?: return@associateWith null
-            parseColor(hex) ?: return call.reject("$name must be #RRGGBB or #RRGGBBAA")
-        }
         run(call) {
             integration.configureTheme(
                 MeetingLawyersIntegration.Theme(
-                    colors["primaryColor"], colors["secondaryColor"], colors["navigationBarColor"],
-                    colors["incomingMessageColor"], colors["outgoingMessageColor"],
+                    call.getString("primaryColor"), call.getString("secondaryColor"), call.getString("navigationBarColor"),
+                    call.getString("incomingMessageColor"), call.getString("outgoingMessageColor"),
                 ),
             )
         }
@@ -121,22 +117,9 @@ class MeetingLawyersPlugin : Plugin() {
         }
     }
 
-    /** Parses a "#RRGGBB" or "#RRGGBBAA" hex string into an ARGB int. */
-    private fun parseColor(hex: String): Int? {
-        val value = hex.removePrefix("#").trim()
-        val argb = when (value.length) {
-            6 -> "FF$value"
-            8 -> value.takeLast(2) + value.take(6)
-            else -> return null
-        }
-        return argb.toLongOrNull(16)?.toInt()
-    }
-
     companion object {
         private const val API_KEY = "apiKey"
         private const val IS_PRODUCTION = "isProduction"
-        private val THEME_COLORS =
-            listOf("primaryColor", "secondaryColor", "navigationBarColor", "incomingMessageColor", "outgoingMessageColor")
 
         /** Configures the SDK with the arguments of the last `configure`, e.g. when a push wakes the killed app. */
         @Synchronized

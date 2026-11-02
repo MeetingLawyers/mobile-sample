@@ -43,11 +43,8 @@ public class MeetingProsPlugin: CAPPlugin, CAPBridgedPlugin {
 
     /// Applies the brand color to both SDKs.
     @objc func configureTheme(_ call: CAPPluginCall) {
-        guard let color = Self.color(call.getString("primaryColor")) else {
-            call.reject("primaryColor must be #RRGGBB or #RRGGBBAA")
-            return
-        }
-        run(call) { self.integration.configureTheme(color: color, logo: nil) }
+        let primaryColor = call.getString("primaryColor") ?? ""
+        run(call) { try self.integration.configureTheme(primaryColor: primaryColor, logo: nil) }
     }
 
     /// Signs the user into both SDKs.
@@ -124,19 +121,6 @@ public class MeetingProsPlugin: CAPPlugin, CAPBridgedPlugin {
             throw MeetingProsPluginError.navigationUnavailable
         }
         return navigationController
-    }
-
-    /// Parses a "#RRGGBB" or "#RRGGBBAA" hex string into a UIColor.
-    private static func color(_ hex: String?) -> UIColor? {
-        guard let hex else { return nil }
-        let value = hex.trimmingCharacters(in: CharacterSet(charactersIn: "# "))
-        guard value.count == 6 || value.count == 8, let rgba = UInt64(value, radix: 16) else { return nil }
-        let hasAlpha = value.count == 8
-        let red = CGFloat((rgba >> (hasAlpha ? 24 : 16)) & 0xFF) / 255
-        let green = CGFloat((rgba >> (hasAlpha ? 16 : 8)) & 0xFF) / 255
-        let blue = CGFloat((rgba >> (hasAlpha ? 8 : 0)) & 0xFF) / 255
-        let alpha = hasAlpha ? CGFloat(rgba & 0xFF) / 255 : 1
-        return UIColor(red: red, green: green, blue: blue, alpha: alpha)
     }
 }
 

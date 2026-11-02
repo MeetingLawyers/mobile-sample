@@ -8,6 +8,7 @@ const apiKey = String.fromEnvironment('ML_API_KEY');
 const userId = String.fromEnvironment('ML_USER_ID');
 const isProduction = String.fromEnvironment('ML_ENVIRONMENT') == 'PROD';
 const brandColor = Color(0xFF1E5AA8);
+const brandHex = '#1E5AA8';
 
 void main() => runApp(const SampleApp());
 
@@ -50,7 +51,7 @@ class _HomePageState extends State<HomePage> {
     }
     await _run(() async {
       await MeetingLawyers.configure(apiKey: apiKey, isProduction: isProduction);
-      final color = brandColor.toARGB32();
+      const color = brandHex;
       await MeetingLawyers.configureTheme(
         primaryColor: color,
         secondaryColor: color,

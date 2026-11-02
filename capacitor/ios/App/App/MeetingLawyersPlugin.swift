@@ -31,28 +31,15 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
 
     /// Applies the theme colors; every color is optional.
     @objc func configureTheme(_ call: CAPPluginCall) {
-        var colors: [String: UIColor] = [:]
-        for name in Self.themeColors {
-            guard let hex = call.getString(name) else { continue }
-            guard let color = Self.color(hex) else {
-                call.reject("\(name) must be #RRGGBB or #RRGGBBAA")
-                return
-            }
-            colors[name] = color
-        }
         let theme = MeetingLawyersIntegration.Theme(
-            primaryColor: colors["primaryColor"],
-            secondaryColor: colors["secondaryColor"],
-            navigationBarColor: colors["navigationBarColor"],
-            incomingMessageColor: colors["incomingMessageColor"],
-            outgoingMessageColor: colors["outgoingMessageColor"]
+            primaryColor: call.getString("primaryColor"),
+            secondaryColor: call.getString("secondaryColor"),
+            navigationBarColor: call.getString("navigationBarColor"),
+            incomingMessageColor: call.getString("incomingMessageColor"),
+            outgoingMessageColor: call.getString("outgoingMessageColor")
         )
-        run(call) { self.integration.configureTheme(theme) }
+        run(call) { try self.integration.configureTheme(theme) }
     }
-
-    private static let themeColors = [
-        "primaryColor", "secondaryColor", "navigationBarColor", "incomingMessageColor", "outgoingMessageColor"
-    ]
 
     /// Signs the user in, asks for push permission and registers the push token.
     @objc func authenticate(_ call: CAPPluginCall) {
@@ -106,18 +93,6 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
             throw MeetingLawyersPluginError.navigationUnavailable
         }
         return navigationController
-    }
-
-    /// Parses a "#RRGGBB" or "#RRGGBBAA" hex string into a UIColor.
-    private static func color(_ hex: String) -> UIColor? {
-        let value = hex.trimmingCharacters(in: CharacterSet(charactersIn: "# "))
-        guard value.count == 6 || value.count == 8, let rgba = UInt64(value, radix: 16) else { return nil }
-        let hasAlpha = value.count == 8
-        let red = CGFloat((rgba >> (hasAlpha ? 24 : 16)) & 0xFF) / 255
-        let green = CGFloat((rgba >> (hasAlpha ? 16 : 8)) & 0xFF) / 255
-        let blue = CGFloat((rgba >> (hasAlpha ? 8 : 0)) & 0xFF) / 255
-        let alpha = hasAlpha ? CGFloat(rgba & 0xFF) / 255 : 1
-        return UIColor(red: red, green: green, blue: blue, alpha: alpha)
     }
 }
 

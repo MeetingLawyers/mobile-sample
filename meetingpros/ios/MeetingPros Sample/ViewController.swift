@@ -11,6 +11,7 @@ final class ViewController: UIViewController {
         case authenticated = "Authenticated"
     }
 
+    private static let brandHex = "#2E7D6B"
     private static let brandColor = UIColor(red: 0x2E / 255, green: 0x7D / 255, blue: 0x6B / 255, alpha: 1)
 
     private let integration = Integration.shared
@@ -52,7 +53,7 @@ final class ViewController: UIViewController {
             try await integration.configure(lawyersApiKey: Constants.lawyersApiKey,
                                             doctorsApiKey: Constants.doctorsApiKey,
                                             isProduction: Constants.isProduction)
-            integration.configureTheme(color: Self.brandColor, logo: UIImage(named: "ml_logo"))
+            try integration.configureTheme(primaryColor: Self.brandHex, logo: UIImage(named: "ml_logo"))
             if integration.isAuthenticated {
                 await signedIn()
             } else {
