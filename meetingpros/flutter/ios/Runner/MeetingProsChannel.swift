@@ -48,7 +48,7 @@ final class MeetingProsChannel: NSObject, FlutterPlugin {
         case "openLawyerChat":
             let hash = arguments["professionalHash"] as? String ?? ""
             guard !hash.isEmpty else { throw ChannelError.invalidArgument("professionalHash") }
-            try await integration.openLawyerChat(professionalHash: hash, from: try navigationController())
+            try await integration.openLawyerChat(professionalHash: hash, in: try navigationController())
         case "availableFeatures":
             let available = await integration.availableFeatures()
             return Self.features.filter { available.contains($0.value) }.map(\.key).sorted()

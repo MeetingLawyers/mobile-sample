@@ -61,7 +61,7 @@ public class MeetingLawyersPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("professionalHash is required")
             return
         }
-        run(call) { try await self.integration.openChat(professionalHash: hash, from: try self.navigationController()) }
+        run(call) { try await self.integration.openChat(professionalHash: hash, in: try self.navigationController()) }
     }
 
     /// True while a user is signed in.

@@ -71,7 +71,7 @@ public class MeetingProsPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("professionalHash is required")
             return
         }
-        run(call) { try await self.integration.openLawyerChat(professionalHash: hash, from: try self.navigationController()) }
+        run(call) { try await self.integration.openLawyerChat(professionalHash: hash, in: try self.navigationController()) }
     }
 
     /// Returns the MeetingDoctors features the company has.

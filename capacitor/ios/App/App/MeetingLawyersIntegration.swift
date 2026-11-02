@@ -87,18 +87,28 @@ final class MeetingLawyersIntegration: NSObject {
 
     /// Pushes the professional list onto the app's navigation; tapping a professional opens its chat.
     @MainActor
-    func openProfessionalList(in navigationController: UINavigationController) throws {
+    func openProfessionalList(in navigationController: UINavigationController, animated: Bool = true) throws {
         guard let list = MeetingLawyersApp.professionalListViewController()?.viewControllers.first else {
             throw IntegrationError.professionalListUnavailable
         }
-        navigationController.pushViewController(list, animated: true)
+        navigationController.pushViewController(list, animated: animated)
     }
 
-    /// Opens the chat with the professional identified by `professionalHash`.
+    /// Opens the chat with the professional identified by `professionalHash`, from any screen.
     @MainActor
-    func openChat(professionalHash: String, from viewController: UIViewController) async throws {
-        let action = MeetingLawyersAction.chat(filter: .professionalHash(hash: professionalHash))
-        try await MeetingLawyersApp.execute(action: action, origin: viewController)
+    func openChat(professionalHash: String, in navigationController: UINavigationController) async throws {
+        try await execute(.chat(filter: .professionalHash(hash: professionalHash)), in: navigationController)
+    }
+
+    /// The SDK opens a chat only over its professional list, so this pushes the list first when it is not open.
+    @MainActor
+    private func execute(_ action: MeetingLawyersAction, in navigationController: UINavigationController) async throws {
+        do {
+            try await MeetingLawyersApp.execute(action: action, origin: navigationController)
+        } catch MeetingLawyersError.actionFailed(reason: .executionError) {
+            try openProfessionalList(in: navigationController, animated: false)
+            try await MeetingLawyersApp.execute(action: action, origin: navigationController)
+        }
     }
 }
 
@@ -137,7 +147,7 @@ extension MeetingLawyersIntegration: MessagingDelegate, UNUserNotificationCenter
         _ = MeetingLawyersApp.userNotificationCenter(willPresent: notification.request, completionHandler: completionHandler)
     }
 
-    /// Lets the SDK open the chat of a tapped push; ignores the rest.
+    /// Lets the SDK open the chat of a tapped push, from any screen; ignores the rest.
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -145,8 +155,25 @@ extension MeetingLawyersIntegration: MessagingDelegate, UNUserNotificationCenter
             completionHandler()
             return
         }
-        _ = MeetingLawyersApp.userNotificationCenter(didReceive: response.notification.request) { _ in
+        _ = MeetingLawyersApp.userNotificationCenter(didReceive: response.notification.request) { error in
+            if case .actionFailed(reason: .executionError(let action))? = error {
+                Task { @MainActor in
+                    guard let navigationController = Self.appNavigationController else { return }
+                    try? await self.execute(action, in: navigationController)
+                }
+            }
             completionHandler()
         }
+    }
+
+    /// Where the chat of a tapped push opens: the topmost navigation controller, or its selected tab's.
+    @MainActor
+    private static var appNavigationController: UINavigationController? {
+        var top = UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.keyWindow?.rootViewController }
+            .first
+        while let presented = top?.presentedViewController { top = presented }
+        return (top as? UITabBarController)?.selectedViewController as? UINavigationController
+            ?? top as? UINavigationController
     }
 }
