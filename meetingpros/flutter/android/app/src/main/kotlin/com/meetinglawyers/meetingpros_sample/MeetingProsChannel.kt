@@ -42,7 +42,7 @@ class MeetingProsChannel private constructor(private val activity: FragmentActiv
     private suspend fun perform(call: MethodCall): Any? {
         when (call.method) {
             "configure" -> {
-                val lawyersApiKey = call.argument<String>("lawyersApiKey").orEmpty()
+                val lawyersApiKey = call.argument<String>("lawyersApiKey").orEmpty().ifEmpty { error("lawyersApiKey is required") }
                 val doctorsApiKey = call.argument<String>("doctorsApiKey").orEmpty()
                 val isProduction = call.argument<Boolean>("isProduction") ?: true
                 integration.configure(activity.application, lawyersApiKey, doctorsApiKey, isProduction, MainActivity::class.java)
@@ -52,7 +52,7 @@ class MeetingProsChannel private constructor(private val activity: FragmentActiv
             }
             "configureTheme" -> integration.configureTheme(call.argument<String>("primaryColor").orEmpty())
             "authenticate" -> {
-                integration.authenticate(requireNotNull(call.argument<String>("userId")) { "userId is required" })
+                integration.authenticate(call.argument<String>("userId").orEmpty().ifEmpty { error("userId is required") })
                 requestNotificationPermission()
             }
             "openProfessionalList" -> integration.openProfessionalList(

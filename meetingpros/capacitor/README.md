@@ -75,6 +75,9 @@ the manifest and add your `google-services.json`. Two template changes the Meeti
 - The app theme must descend from `Theme.MaterialComponents` (see [`styles.xml`](android/app/src/main/res/values/styles.xml)).
 - Remove the template's `androidx.core.content.FileProvider` from the manifest: MeetingDoctors declares its own.
 
+Keep the SDK sessions and the saved values on the device: set `android:allowBackup="false"` and point
+`android:dataExtractionRules` to rules that exclude everything, like [`data_extraction_rules.xml`](android/app/src/main/res/xml/data_extraction_rules.xml).
+
 `configure` blocks the main thread for a couple of seconds while both SDKs start; later calls (a web reload)
 do nothing. The plugin saves its arguments, so a push that wakes the killed app configures the SDKs before it
 is routed. The video call SDK takes every data push that is not a lawyers or doctors chat one: only

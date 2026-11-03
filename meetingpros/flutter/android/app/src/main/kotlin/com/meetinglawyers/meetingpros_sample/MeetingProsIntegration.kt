@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.util.Log
 import androidx.activity.addCallback
 import androidx.core.content.edit
@@ -86,7 +87,8 @@ object MeetingProsIntegration {
         if (isConfigured) return
         this.application = application
         this.pushActivity = pushActivity
-        val logMode = if (isProduction) LogMode.NONE else LogMode.VERBOSE
+        val debuggable = (application.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        val logMode = if (debuggable && !isProduction) LogMode.VERBOSE else LogMode.NONE
         val lawyersMode = if (isProduction) LawyersBuildMode.PROD else LawyersBuildMode.DEV
         MeetingLawyersSDK(application, lawyersApiKey, lawyersMode, Locale.getDefault(), logMode).build()
 

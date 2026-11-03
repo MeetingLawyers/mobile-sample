@@ -56,6 +56,8 @@ cp .env.example .env
 
 With MeetingPros credentials (`ML_API_KEY` of a MeetingPros company plus its `MD_API_KEY`) one `.env`
 runs every sample. Write plain `KEY=value` lines with no comments: the iOS projects read this file as an Xcode `.xcconfig`.
+Keep only these keys in it: the iOS and Flutter builds pass every key of the file to the build, so other secrets
+(for example a package registry token) belong in your shell or `~/.gradle/gradle.properties`.
 
 ## License
 

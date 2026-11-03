@@ -66,6 +66,8 @@ implementation("com.google.firebase:firebase-messaging")
 
 Then:
 
+- Keep the SDK sessions and the saved values on the device: set `android:allowBackup="false"` and point
+  `android:dataExtractionRules` to rules that exclude everything, like [`data_extraction_rules.xml`](android/app/src/main/res/xml/data_extraction_rules.xml).
 - `MainActivity` must extend `FlutterFragmentActivity` (the MeetingDoctors lists are fragments) and call
   `MeetingProsChannel.register(flutterEngine, this)` in `configureFlutterEngine`: see [`MainActivity.kt`](android/app/src/main/kotlin/com/meetinglawyers/meetingpros_sample/MainActivity.kt).
 - `LaunchTheme` and `NormalTheme` must descend from `Theme.MaterialComponents` (see [`styles.xml`](android/app/src/main/res/values/styles.xml)).

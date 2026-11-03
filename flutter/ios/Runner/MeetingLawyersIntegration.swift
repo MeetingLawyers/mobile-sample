@@ -19,14 +19,23 @@ final class MeetingLawyersIntegration: NSObject {
         }
     }
 
-    /// Initializes the SDK: production, or the demo environment with debug logs.
+    /// Initializes the SDK: production, or the demo environment with SDK logs in debug builds.
     func configure(apiKey: String, isProduction: Bool) async throws {
         let configuration = MeetingLawyersConfiguration(
             apiKey: apiKey,
             environment: isProduction ? .production : .development,
-            logType: isProduction ? .none : .debug
+            logType: Self.logType(isProduction: isProduction)
         )
         try await MeetingLawyersApp.configure(configuration)
+    }
+
+    /// SDK logs only in debug builds of the demo environment.
+    private static func logType(isProduction: Bool) -> ConfigurationLogType {
+        #if DEBUG
+        return isProduction ? .none : .debug
+        #else
+        return .none
+        #endif
     }
 
     /// Colors of the SDK screens shared by iOS and Android, as "#RRGGBB" or "#RRGGBBAA"; a nil color keeps the SDK default.
