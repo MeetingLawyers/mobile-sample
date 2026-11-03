@@ -1,6 +1,8 @@
 package com.meetinglawyers.meetingpros_sample
 
 import android.Manifest
+import android.app.Application
+import android.content.Context
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
@@ -39,11 +41,15 @@ class MeetingProsChannel private constructor(private val activity: FragmentActiv
 
     private suspend fun perform(call: MethodCall): Any? {
         when (call.method) {
-            "configure" -> integration.configure(
-                activity.application, call.argument<String>("lawyersApiKey").orEmpty(),
-                call.argument<String>("doctorsApiKey").orEmpty(), call.argument<Boolean>("isProduction") ?: true,
-                pushActivity = activity.javaClass,
-            )
+            "configure" -> {
+                val lawyersApiKey = call.argument<String>("lawyersApiKey").orEmpty()
+                val doctorsApiKey = call.argument<String>("doctorsApiKey").orEmpty()
+                val isProduction = call.argument<Boolean>("isProduction") ?: true
+                integration.configure(activity.application, lawyersApiKey, doctorsApiKey, isProduction, MainActivity::class.java)
+                preferences(activity).edit()
+                    .putString(LAWYERS_API_KEY, lawyersApiKey).putString(DOCTORS_API_KEY, doctorsApiKey)
+                    .putBoolean(IS_PRODUCTION, isProduction).apply()
+            }
             "configureTheme" -> integration.configureTheme(call.argument<String>("primaryColor").orEmpty())
             "authenticate" -> {
                 integration.authenticate(requireNotNull(call.argument<String>("userId")) { "userId is required" })
@@ -77,6 +83,24 @@ class MeetingProsChannel private constructor(private val activity: FragmentActiv
     }
 
     companion object {
+        private const val LAWYERS_API_KEY = "lawyersApiKey"
+        private const val DOCTORS_API_KEY = "doctorsApiKey"
+        private const val IS_PRODUCTION = "isProduction"
+
+        /** Where `configure` keeps its values. */
+        private fun preferences(context: Context) = context.getSharedPreferences("meeting_pros_channel", Context.MODE_PRIVATE)
+
+        /** Configures both SDKs with the last values from Dart when a push wakes the app before Flutter runs. */
+        fun configureFromSavedArguments(application: Application) {
+            if (MeetingProsIntegration.isConfigured) return
+            val saved = preferences(application)
+            val lawyersApiKey = saved.getString(LAWYERS_API_KEY, null) ?: return
+            val doctorsApiKey = saved.getString(DOCTORS_API_KEY, null) ?: return
+            MeetingProsIntegration.configure(
+                application, lawyersApiKey, doctorsApiKey, saved.getBoolean(IS_PRODUCTION, true), MainActivity::class.java,
+            )
+        }
+
         /** Registers the channel; call it from `configureFlutterEngine`. */
         fun register(engine: FlutterEngine, activity: FragmentActivity) {
             MethodChannel(engine.dartExecutor.binaryMessenger, "meeting_pros").setMethodCallHandler(MeetingProsChannel(activity))

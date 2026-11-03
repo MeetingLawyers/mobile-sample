@@ -42,11 +42,15 @@ try await integration.configure(lawyersApiKey: "<lawyers key>", doctorsApiKey: "
 try integration.configureTheme(primaryColor: "#2E7D6B", logo: UIImage(named: "logo"))
 try await integration.authenticate(userId: "<user id>")       // both SDKs; also asks for push permission
 try integration.openProfessionalList(.doctors, in: navigationController)   // .lawyers, .doctors or .vets
-try await integration.openLawyerChat(professionalHash: hash, from: viewController)
+try await integration.openLawyerChat(professionalHash: hash, in: navigationController) // from any screen
 let features = await integration.availableFeatures()           // e.g. [.videoCall, .medicalHistory]
 try await integration.open(.medicalHistory, in: navigationController)
 try await integration.logout()                                  // both SDKs
 ```
+
+MeetingLawyers opens a chat only over its lawyers list, so `openLawyerChat` and a tapped lawyers push open the
+list first when it is not open. A tapped push uses the topmost navigation controller (or its selected tab's):
+change `appNavigationController` if your app has another structure.
 
 With `isProduction: false` lawyers use the demo environment and doctors the staging one. Call `configure` as
 early as possible (calling it again does nothing): a push tapped before it finishes only opens the app.

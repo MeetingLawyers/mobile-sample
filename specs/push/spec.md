@@ -38,7 +38,7 @@ The wrapper MUST hand MeetingLawyers pushes to the SDK and MUST leave every othe
 #### Scenario: tap on a MeetingLawyers push
 
 - WHEN the user taps a MeetingLawyers push
-- THEN the SDK opens the related chat
+- THEN the SDK opens the related chat, from any screen, as in [chat](../chat/spec.md)
 
 #### Scenario: another push
 
@@ -56,7 +56,7 @@ The wrapper MUST hand MeetingLawyers pushes to the SDK and MUST leave every othe
 
 | Sample | Where |
 |---|---|
-| `ios/` | `MeetingLawyersIntegration` push extension: delegates set on launch, token sent after authenticate |
+| `ios/` | `MeetingLawyersIntegration` push extension: delegates set on launch, token sent after authenticate, chat opened on the topmost navigation controller |
 | `android/` | `MeetingLawyersMessagingService.kt` + `MeetingLawyersIntegration`: token sent after authenticate, permission asked on Android 13+ |
 | `capacitor/` | Inside `MeetingLawyers.authenticate()`; delegates set in `AppDelegate` (iOS), SDK configured from saved values when a push wakes the app (Android) |
 | `flutter/` | Inside `MeetingLawyers.authenticate()`; delegates set in `AppDelegate` (iOS), SDK configured from saved values when a push wakes the app (Android) |
