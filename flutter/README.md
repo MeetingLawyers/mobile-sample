@@ -62,6 +62,8 @@ Then:
   [`MainActivity.kt`](android/app/src/main/kotlin/com/meetinglawyers/sample/flutter/MainActivity.kt).
 - `LaunchTheme` and `NormalTheme` must be AppCompat-based, e.g. `Theme.MaterialComponents` (see [`styles.xml`](android/app/src/main/res/values/styles.xml)).
 - Declare `MeetingLawyersMessagingService` in the manifest and add your `google-services.json`.
+- Keep the SDK session and the saved values on the device: set `android:allowBackup="false"` and point
+  `android:dataExtractionRules` to rules that exclude everything, like [`data_extraction_rules.xml`](android/app/src/main/res/xml/data_extraction_rules.xml).
 
 **4. Use it** from Dart:
 

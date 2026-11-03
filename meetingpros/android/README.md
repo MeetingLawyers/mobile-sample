@@ -111,6 +111,10 @@ and share your Firebase credentials with MeetingLawyers as described in the
 call SDK cannot tell its pushes apart, though: it takes every data push that is not a lawyers or doctors chat
 one, so only notification-only pushes reach your code.
 
+**6. Backups.** Keep the SDK sessions on the device: set `android:allowBackup="false"` and point
+`android:dataExtractionRules` to rules that exclude everything, like
+[`data_extraction_rules.xml`](app/src/main/res/xml/data_extraction_rules.xml) (see `AndroidManifest.xml`).
+
 The contract it fulfils is in [`specs/meetingpros/`](../../specs/meetingpros/spec.md).
 
 ## Run this sample

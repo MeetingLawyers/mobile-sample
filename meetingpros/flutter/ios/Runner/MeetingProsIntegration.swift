@@ -46,7 +46,7 @@ final class MeetingProsIntegration: NSObject {
         try await MeetingLawyersApp.configure(MeetingLawyersConfiguration(
             apiKey: lawyersApiKey,
             environment: isProduction ? .production : .development,
-            logType: isProduction ? .none : .debug
+            logType: Self.logType(isProduction: isProduction)
         ))
         // Leaves crash reporting to your app.
         MeetingDoctors.style.flags.common.sentryEnabled = false
@@ -55,6 +55,15 @@ final class MeetingProsIntegration: NSObject {
             environment: isProduction ? .production : .staging
         ))
         isConfigured = true
+    }
+
+    /// SDK logs only in debug builds of the demo environment.
+    private static func logType(isProduction: Bool) -> ConfigurationLogType {
+        #if DEBUG
+        return isProduction ? .none : .debug
+        #else
+        return .none
+        #endif
     }
 
     /// Applies the brand color ("#RRGGBB" or "#RRGGBBAA") to both SDKs and shows the logo in the lawyers navigation bar.

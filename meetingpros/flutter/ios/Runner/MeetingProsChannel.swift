@@ -35,13 +35,13 @@ final class MeetingProsChannel: NSObject, FlutterPlugin {
     private func perform(_ method: String, _ arguments: [String: Any]) async throws -> Any? {
         switch method {
         case "configure":
-            try await integration.configure(lawyersApiKey: arguments["lawyersApiKey"] as? String ?? "",
+            try await integration.configure(lawyersApiKey: try Self.required("lawyersApiKey", in: arguments),
                                             doctorsApiKey: arguments["doctorsApiKey"] as? String ?? "",
                                             isProduction: arguments["isProduction"] as? Bool ?? true)
         case "configureTheme":
             try integration.configureTheme(primaryColor: arguments["primaryColor"] as? String ?? "", logo: nil)
         case "authenticate":
-            try await integration.authenticate(userId: arguments["userId"] as? String ?? "")
+            try await integration.authenticate(userId: try Self.required("userId", in: arguments))
         case "openProfessionalList":
             guard let type = Self.listTypes[arguments["type"] as? String ?? ""] else { throw ChannelError.invalidArgument("type") }
             try integration.openProfessionalList(type, in: try navigationController())
@@ -73,6 +73,11 @@ final class MeetingProsChannel: NSObject, FlutterPlugin {
             .first
         guard let navigationController = root as? UINavigationController else { throw ChannelError.navigationUnavailable }
         return navigationController
+    }
+
+    private static func required(_ name: String, in arguments: [String: Any]) throws -> String {
+        guard let value = arguments[name] as? String, !value.isEmpty else { throw ChannelError.invalidArgument(name) }
+        return value
     }
 }
 

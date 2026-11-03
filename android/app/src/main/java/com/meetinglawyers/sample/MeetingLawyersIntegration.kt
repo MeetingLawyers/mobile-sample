@@ -2,6 +2,7 @@ package com.meetinglawyers.sample
 
 import android.app.Activity
 import android.app.Application
+import android.content.pm.ApplicationInfo
 import android.os.Handler
 import android.os.Looper
 import com.google.firebase.messaging.FirebaseMessaging
@@ -26,10 +27,11 @@ object MeetingLawyersIntegration {
     val isAuthenticated: Boolean
         get() = isConfigured && client.isAuthenticated()
 
-    /** Initializes the SDK: production, or the demo environment with verbose logs. Call it from `Application.onCreate`. */
+    /** Initializes the SDK: production, or the demo environment with verbose logs in debug builds. Call it from `Application.onCreate`. */
     fun configure(application: Application, apiKey: String, isProduction: Boolean) {
         val buildMode = if (isProduction) CustomerSdkBuildMode.PROD else CustomerSdkBuildMode.DEV
-        val logMode = if (isProduction) LogMode.NONE else LogMode.VERBOSE
+        val debuggable = (application.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        val logMode = if (debuggable && !isProduction) LogMode.VERBOSE else LogMode.NONE
         MeetingLawyersSDK(application, apiKey, buildMode, Locale.getDefault(), logMode).build()
     }
 

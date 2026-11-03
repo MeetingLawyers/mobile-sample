@@ -40,13 +40,13 @@ class MeetingProsChannel private constructor(private val activity: FragmentActiv
     private suspend fun perform(call: MethodCall): Any? {
         when (call.method) {
             "configure" -> integration.configure(
-                activity.application, call.argument<String>("lawyersApiKey").orEmpty(),
+                activity.application, call.argument<String>("lawyersApiKey").orEmpty().ifEmpty { error("lawyersApiKey is required") },
                 call.argument<String>("doctorsApiKey").orEmpty(), call.argument<Boolean>("isProduction") ?: true,
                 pushActivity = activity.javaClass,
             )
             "configureTheme" -> integration.configureTheme(call.argument<String>("primaryColor").orEmpty())
             "authenticate" -> {
-                integration.authenticate(requireNotNull(call.argument<String>("userId")) { "userId is required" })
+                integration.authenticate(call.argument<String>("userId").orEmpty().ifEmpty { error("userId is required") })
                 requestNotificationPermission()
             }
             "openProfessionalList" -> integration.openProfessionalList(
