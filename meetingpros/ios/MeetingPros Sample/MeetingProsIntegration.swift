@@ -124,7 +124,7 @@ final class MeetingProsIntegration: NSObject {
 
     /// Pushes the list of the given type onto the app's navigation; tapping a professional opens its chat.
     @MainActor
-    func openProfessionalList(_ type: ProfessionalType, in navigationController: UINavigationController) throws {
+    func openProfessionalList(_ type: ProfessionalType, in navigationController: UINavigationController, animated: Bool = true) throws {
         let list: UIViewController
         switch type {
         case .lawyers:
@@ -141,14 +141,24 @@ final class MeetingProsIntegration: NSObject {
                 filter: MeetingDoctorsFilter(specialities: Self.vetSpecialities, excludeRoles: false)
             )
         }
-        navigationController.pushViewController(list, animated: true)
+        navigationController.pushViewController(list, animated: animated)
     }
 
-    /// Opens the chat with the lawyer identified by `professionalHash`.
+    /// Opens the chat with the lawyer identified by `professionalHash`, from any screen.
     @MainActor
-    func openLawyerChat(professionalHash: String, from viewController: UIViewController) async throws {
-        let action = MeetingLawyersAction.chat(filter: .professionalHash(hash: professionalHash))
-        try await MeetingLawyersApp.execute(action: action, origin: viewController)
+    func openLawyerChat(professionalHash: String, in navigationController: UINavigationController) async throws {
+        try await execute(.chat(filter: .professionalHash(hash: professionalHash)), in: navigationController)
+    }
+
+    /// MeetingLawyers opens a chat only over its lawyers list, so this pushes the list first when it is not open.
+    @MainActor
+    private func execute(_ action: MeetingLawyersAction, in navigationController: UINavigationController) async throws {
+        do {
+            try await MeetingLawyersApp.execute(action: action, origin: navigationController)
+        } catch MeetingLawyersError.actionFailed(reason: .executionError) {
+            try openProfessionalList(.lawyers, in: navigationController, animated: false)
+            try await MeetingLawyersApp.execute(action: action, origin: navigationController)
+        }
     }
 
     /// The MeetingDoctors features the company has. Call it after authenticating.
@@ -220,12 +230,18 @@ extension MeetingProsIntegration: MessagingDelegate, UNUserNotificationCenterDel
         }
     }
 
-    /// Lets the SDK that owns a tapped push open its chat; ignores the rest.
+    /// Lets the SDK that owns a tapped push open its chat, from any screen; ignores the rest.
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         if MeetingLawyersApp.isMeetingLawyersPush(notification: response.notification) {
-            _ = MeetingLawyersApp.userNotificationCenter(didReceive: response.notification.request) { _ in
+            _ = MeetingLawyersApp.userNotificationCenter(didReceive: response.notification.request) { error in
+                if case .actionFailed(reason: .executionError(let action))? = error {
+                    Task { @MainActor in
+                        guard let navigationController = Self.appNavigationController else { return }
+                        try? await self.execute(action, in: navigationController)
+                    }
+                }
                 completionHandler()
             }
             return
@@ -235,6 +251,17 @@ extension MeetingProsIntegration: MessagingDelegate, UNUserNotificationCenterDel
                 completionHandler()
             }
         }
+    }
+
+    /// Where the chat of a tapped lawyers push opens: the topmost navigation controller, or its selected tab's.
+    @MainActor
+    private static var appNavigationController: UINavigationController? {
+        var top = UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.keyWindow?.rootViewController }
+            .first
+        while let presented = top?.presentedViewController { top = presented }
+        return (top as? UITabBarController)?.selectedViewController as? UINavigationController
+            ?? top as? UINavigationController
     }
 
     /// Sends the FCM token to both SDKs.

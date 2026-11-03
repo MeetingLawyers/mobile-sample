@@ -71,7 +71,8 @@ final class ViewController: UIViewController {
             show("Type a professional hash first.")
             return
         }
-        run { try await self.integration.openChat(professionalHash: hash, from: self) }
+        guard let navigationController else { return }
+        run { try await self.integration.openChat(professionalHash: hash, in: navigationController) }
     }
 
     @objc private func logOut() {

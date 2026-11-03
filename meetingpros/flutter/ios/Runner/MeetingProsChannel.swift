@@ -46,9 +46,8 @@ final class MeetingProsChannel: NSObject, FlutterPlugin {
             guard let type = Self.listTypes[arguments["type"] as? String ?? ""] else { throw ChannelError.invalidArgument("type") }
             try integration.openProfessionalList(type, in: try navigationController())
         case "openLawyerChat":
-            let hash = arguments["professionalHash"] as? String ?? ""
-            guard !hash.isEmpty else { throw ChannelError.invalidArgument("professionalHash") }
-            try await integration.openLawyerChat(professionalHash: hash, from: try navigationController())
+            try await integration.openLawyerChat(professionalHash: try Self.required("professionalHash", in: arguments),
+                                                 in: try navigationController())
         case "availableFeatures":
             let available = await integration.availableFeatures()
             return Self.features.filter { available.contains($0.value) }.map(\.key).sorted()

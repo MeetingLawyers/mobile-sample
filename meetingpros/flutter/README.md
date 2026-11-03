@@ -71,7 +71,8 @@ Then:
 - `MainActivity` must extend `FlutterFragmentActivity` (the MeetingDoctors lists are fragments) and call
   `MeetingProsChannel.register(flutterEngine, this)` in `configureFlutterEngine`: see [`MainActivity.kt`](android/app/src/main/kotlin/com/meetinglawyers/meetingpros_sample/MainActivity.kt).
 - `LaunchTheme` and `NormalTheme` must descend from `Theme.MaterialComponents` (see [`styles.xml`](android/app/src/main/res/values/styles.xml)).
-- Declare `MeetingProsMessagingService` in the manifest and add your `google-services.json`.
+- Declare `MeetingProsMessagingService` in the manifest and add your `google-services.json`. The channel saves
+  the `configure` arguments, so a push that wakes the killed app configures the SDKs before it is routed.
 
 **4. Use it** from Dart:
 

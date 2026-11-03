@@ -88,7 +88,8 @@ final class ViewController: UIViewController {
             show("Type a lawyer's professional hash first.")
             return
         }
-        run { try await self.integration.openLawyerChat(professionalHash: hash, from: self) }
+        guard let navigationController else { return }
+        run { try await self.integration.openLawyerChat(professionalHash: hash, in: navigationController) }
     }
 
     private func open(_ feature: Integration.DoctorsFeature) {

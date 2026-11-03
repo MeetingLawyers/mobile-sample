@@ -40,9 +40,13 @@ let integration = MeetingLawyersIntegration.shared
 try integration.configureTheme(.init(primaryColor: "#2E7D6B"), logo: UIImage(named: "logo")) // hex, every color optional
 try await integration.authenticate(userId: "<user id>")   // also asks for push permission
 try integration.openProfessionalList(in: navigationController)
-try await integration.openChat(professionalHash: hash, from: viewController)
+try await integration.openChat(professionalHash: hash, in: navigationController) // from any screen
 try await integration.logout()
 ```
+
+The SDK opens a chat only over its professional list, so `openChat` and a tapped chat push open the list first
+when it is not open. A tapped push uses the topmost navigation controller (or its selected tab's): change
+`appNavigationController` if your app has another structure.
 
 **5. Permissions and push.** Add `NSCameraUsageDescription` and `NSMicrophoneUsageDescription` to your
 `Info.plist` (the chat sends photos and audio messages). In **Signing & Capabilities** add *Push

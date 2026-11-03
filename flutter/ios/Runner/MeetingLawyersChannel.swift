@@ -44,7 +44,7 @@ final class MeetingLawyersChannel: NSObject, FlutterPlugin {
             try integration.openProfessionalList(in: try navigationController())
         case "openChat":
             try await integration.openChat(professionalHash: try Self.required("professionalHash", in: arguments),
-                                           from: try navigationController())
+                                           in: try navigationController())
         case "isAuthenticated":
             return integration.isAuthenticated
         case "logout":
