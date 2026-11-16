@@ -11,13 +11,13 @@ class MeetingLawyers {
   static Future<void> configure({required String apiKey, required bool isProduction}) =>
       _channel.invokeMethod('configure', {'apiKey': apiKey, 'isProduction': isProduction});
 
-  /// Applies the theme colors (0xAARRGGBB). Every color is optional; the ones left out keep the SDK default.
+  /// Applies the theme colors ('#RRGGBB' or '#RRGGBBAA'). Every color is optional; the ones left out keep the SDK default.
   static Future<void> configureTheme({
-    int? primaryColor,
-    int? secondaryColor,
-    int? navigationBarColor,
-    int? incomingMessageColor,
-    int? outgoingMessageColor,
+    String? primaryColor,
+    String? secondaryColor,
+    String? navigationBarColor,
+    String? incomingMessageColor,
+    String? outgoingMessageColor,
   }) =>
       _channel.invokeMethod('configureTheme', {
         'primaryColor': primaryColor,

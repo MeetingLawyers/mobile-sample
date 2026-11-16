@@ -66,10 +66,13 @@ implementation("com.google.firebase:firebase-messaging")
 
 Then:
 
+- Keep the SDK sessions and the saved values on the device: set `android:allowBackup="false"` and point
+  `android:dataExtractionRules` to rules that exclude everything, like [`data_extraction_rules.xml`](android/app/src/main/res/xml/data_extraction_rules.xml).
 - `MainActivity` must extend `FlutterFragmentActivity` (the MeetingDoctors lists are fragments) and call
   `MeetingProsChannel.register(flutterEngine, this)` in `configureFlutterEngine`: see [`MainActivity.kt`](android/app/src/main/kotlin/com/meetinglawyers/meetingpros_sample/MainActivity.kt).
 - `LaunchTheme` and `NormalTheme` must descend from `Theme.MaterialComponents` (see [`styles.xml`](android/app/src/main/res/values/styles.xml)).
-- Declare `MeetingProsMessagingService` in the manifest and add your `google-services.json`.
+- Declare `MeetingProsMessagingService` in the manifest and add your `google-services.json`. The channel saves
+  the `configure` arguments, so a push that wakes the killed app configures the SDKs before it is routed.
 
 **4. Use it** from Dart:
 
@@ -77,7 +80,7 @@ Then:
 import 'meeting_pros/meeting_pros.dart';
 
 await MeetingPros.configure(lawyersApiKey: lawyersKey, doctorsApiKey: doctorsKey, isProduction: false); // demo + staging
-await MeetingPros.configureTheme(0xFF2E7D6B);
+await MeetingPros.configureTheme('#2E7D6B');
 await MeetingPros.authenticate(userId);                 // both SDKs, plus push permission and token
 await MeetingPros.openProfessionalList(ProfessionalType.vets); // lawyers, doctors or vets
 await MeetingPros.openLawyerChat(professionalHash);

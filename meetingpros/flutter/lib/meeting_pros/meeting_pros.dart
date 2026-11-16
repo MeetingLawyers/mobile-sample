@@ -25,8 +25,9 @@ class MeetingPros {
         'isProduction': isProduction,
       });
 
-  /// Applies the brand color (0xAARRGGBB) to both SDKs.
-  static Future<void> configureTheme(int color) => _channel.invokeMethod('configureTheme', {'color': color});
+  /// Applies the brand color ('#RRGGBB' or '#RRGGBBAA') to both SDKs.
+  static Future<void> configureTheme(String primaryColor) =>
+      _channel.invokeMethod('configureTheme', {'primaryColor': primaryColor});
 
   /// Signs the user into both SDKs, asks for push permission and registers the push token.
   static Future<void> authenticate(String userId) => _channel.invokeMethod('authenticate', {'userId': userId});

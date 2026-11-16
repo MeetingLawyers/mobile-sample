@@ -19,6 +19,12 @@ The wrapper MUST open the chat with the professional identified by the given has
 - AND the integrator opens the chat with a valid professional hash
 - THEN the chat with that professional is shown
 
+#### Scenario: open a chat from any screen
+
+- WHEN the professional list is not open
+- AND the integrator opens a chat
+- THEN the chat is shown
+
 #### Scenario: open a chat without hash
 
 - WHEN the integrator opens a chat with an empty hash
@@ -31,7 +37,9 @@ The wrapper MUST open the chat with the professional identified by the given has
 | Empty or missing hash | Rejected: `professionalHash is required` |
 | The SDK cannot open it | Rejected: `Could not open the chat: <reason>` |
 
-Native `android/` returns nothing: the SDK reports no errors when opening the chat.
+Native `android/` returns nothing: the SDK reports no errors when opening the chat. On iOS the wrapper first
+pushes the professional list, without animation, on the navigation controller it is given, so going back lands
+on the list.
 
 ## Shown in
 

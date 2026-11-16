@@ -9,44 +9,74 @@ final class MeetingLawyersIntegration: NSObject {
 
     enum IntegrationError: LocalizedError {
         case professionalListUnavailable
+        case invalidColor(String)
 
         var errorDescription: String? {
-            "Could not create the professional list. Configure and authenticate first."
+            switch self {
+            case .professionalListUnavailable: "Could not create the professional list. Configure and authenticate first."
+            case .invalidColor(let name): "\(name) must be #RRGGBB or #RRGGBBAA"
+            }
         }
     }
 
-    /// Initializes the SDK: production, or the demo environment with debug logs.
+    /// Initializes the SDK: production, or the demo environment with SDK logs in debug builds.
     func configure(apiKey: String, isProduction: Bool) async throws {
         let configuration = MeetingLawyersConfiguration(
             apiKey: apiKey,
             environment: isProduction ? .production : .development,
-            logType: isProduction ? .none : .debug
+            logType: Self.logType(isProduction: isProduction)
         )
         try await MeetingLawyersApp.configure(configuration)
     }
 
-    /// Colors of the SDK screens shared by iOS and Android; a nil color keeps the SDK default.
-    struct Theme {
-        var primaryColor: UIColor?
-        var secondaryColor: UIColor?
-        var navigationBarColor: UIColor?
-        var incomingMessageColor: UIColor?
-        var outgoingMessageColor: UIColor?
+    /// SDK logs only in debug builds of the demo environment.
+    private static func logType(isProduction: Bool) -> ConfigurationLogType {
+        #if DEBUG
+        return isProduction ? .none : .debug
+        #else
+        return .none
+        #endif
     }
 
-    /// Applies the theme colors and, if given, shows the logo in the navigation bar.
+    /// Colors of the SDK screens shared by iOS and Android, as "#RRGGBB" or "#RRGGBBAA"; a nil color keeps the SDK default.
+    struct Theme {
+        var primaryColor: String?
+        var secondaryColor: String?
+        var navigationBarColor: String?
+        var incomingMessageColor: String?
+        var outgoingMessageColor: String?
+    }
+
+    /// Applies the theme colors and, if given, shows the logo in the navigation bar; throws on an invalid color.
     @MainActor
-    func configureTheme(_ theme: Theme, logo: UIImage? = nil) {
-        if let color = theme.primaryColor { MeetingLawyersApp.setStyle(primaryColor: color) }
-        if let color = theme.secondaryColor { MeetingLawyersApp.setStyle(secondaryColor: color) }
-        if let color = theme.navigationBarColor { MeetingLawyersApp.setStyle(navigationColor: color) }
-        if let color = theme.incomingMessageColor { MeetingLawyersApp.setStyle(incomingBubbleColor: color) }
-        if let color = theme.outgoingMessageColor { MeetingLawyersApp.setStyle(outgoingBubbleColor: color) }
+    func configureTheme(_ theme: Theme, logo: UIImage? = nil) throws {
+        let primary = try Self.color("primaryColor", theme.primaryColor)
+        let secondary = try Self.color("secondaryColor", theme.secondaryColor)
+        let navigationBar = try Self.color("navigationBarColor", theme.navigationBarColor)
+        let incomingMessage = try Self.color("incomingMessageColor", theme.incomingMessageColor)
+        let outgoingMessage = try Self.color("outgoingMessageColor", theme.outgoingMessageColor)
+        if let primary { MeetingLawyersApp.setStyle(primaryColor: primary) }
+        if let secondary { MeetingLawyersApp.setStyle(secondaryColor: secondary) }
+        if let navigationBar { MeetingLawyersApp.setStyle(navigationColor: navigationBar) }
+        if let incomingMessage { MeetingLawyersApp.setStyle(incomingBubbleColor: incomingMessage) }
+        if let outgoingMessage { MeetingLawyersApp.setStyle(outgoingBubbleColor: outgoingMessage) }
         guard let logo else { return }
         let logoView = UIImageView(image: logo)
         logoView.contentMode = .scaleAspectFit
         logoView.frame = CGRect(x: 0, y: 0, width: 150, height: 32)
         MeetingLawyersApp.setStyle(navigationTitleView: logoView)
+    }
+
+    /// Parses a "#RRGGBB" or "#RRGGBBAA" color; nil when not given.
+    private static func color(_ name: String, _ hex: String?) throws -> UIColor? {
+        guard let hex else { return nil }
+        let value = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
+        guard value.count == 6 || value.count == 8, value.allSatisfy(\.isHexDigit), let parsed = UInt64(value, radix: 16) else {
+            throw IntegrationError.invalidColor(name)
+        }
+        let rgba = value.count == 6 ? (parsed << 8) | 0xFF : parsed
+        return UIColor(red: CGFloat((rgba >> 24) & 0xFF) / 255, green: CGFloat((rgba >> 16) & 0xFF) / 255,
+                       blue: CGFloat((rgba >> 8) & 0xFF) / 255, alpha: CGFloat(rgba & 0xFF) / 255)
     }
 
     /// Signs the user in, then asks for push permission and links this device's token to them.
@@ -66,18 +96,28 @@ final class MeetingLawyersIntegration: NSObject {
 
     /// Pushes the professional list onto the app's navigation; tapping a professional opens its chat.
     @MainActor
-    func openProfessionalList(in navigationController: UINavigationController) throws {
+    func openProfessionalList(in navigationController: UINavigationController, animated: Bool = true) throws {
         guard let list = MeetingLawyersApp.professionalListViewController()?.viewControllers.first else {
             throw IntegrationError.professionalListUnavailable
         }
-        navigationController.pushViewController(list, animated: true)
+        navigationController.pushViewController(list, animated: animated)
     }
 
-    /// Opens the chat with the professional identified by `professionalHash`.
+    /// Opens the chat with the professional identified by `professionalHash`, from any screen.
     @MainActor
-    func openChat(professionalHash: String, from viewController: UIViewController) async throws {
-        let action = MeetingLawyersAction.chat(filter: .professionalHash(hash: professionalHash))
-        try await MeetingLawyersApp.execute(action: action, origin: viewController)
+    func openChat(professionalHash: String, in navigationController: UINavigationController) async throws {
+        try await execute(.chat(filter: .professionalHash(hash: professionalHash)), in: navigationController)
+    }
+
+    /// The SDK opens a chat only over its professional list, so this pushes the list first when it is not open.
+    @MainActor
+    private func execute(_ action: MeetingLawyersAction, in navigationController: UINavigationController) async throws {
+        do {
+            try await MeetingLawyersApp.execute(action: action, origin: navigationController)
+        } catch MeetingLawyersError.actionFailed(reason: .executionError) {
+            try openProfessionalList(in: navigationController, animated: false)
+            try await MeetingLawyersApp.execute(action: action, origin: navigationController)
+        }
     }
 }
 
@@ -116,7 +156,7 @@ extension MeetingLawyersIntegration: MessagingDelegate, UNUserNotificationCenter
         _ = MeetingLawyersApp.userNotificationCenter(willPresent: notification.request, completionHandler: completionHandler)
     }
 
-    /// Lets the SDK open the chat of a tapped push; ignores the rest.
+    /// Lets the SDK open the chat of a tapped push, from any screen; ignores the rest.
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -124,8 +164,25 @@ extension MeetingLawyersIntegration: MessagingDelegate, UNUserNotificationCenter
             completionHandler()
             return
         }
-        _ = MeetingLawyersApp.userNotificationCenter(didReceive: response.notification.request) { _ in
+        _ = MeetingLawyersApp.userNotificationCenter(didReceive: response.notification.request) { error in
+            if case .actionFailed(reason: .executionError(let action))? = error {
+                Task { @MainActor in
+                    guard let navigationController = Self.appNavigationController else { return }
+                    try? await self.execute(action, in: navigationController)
+                }
+            }
             completionHandler()
         }
+    }
+
+    /// Where the chat of a tapped push opens: the topmost navigation controller, or its selected tab's.
+    @MainActor
+    private static var appNavigationController: UINavigationController? {
+        var top = UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.keyWindow?.rootViewController }
+            .first
+        while let presented = top?.presentedViewController { top = presented }
+        return (top as? UITabBarController)?.selectedViewController as? UINavigationController
+            ?? top as? UINavigationController
     }
 }

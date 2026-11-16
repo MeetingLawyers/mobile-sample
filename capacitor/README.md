@@ -61,6 +61,8 @@ Then:
 - Call `registerPlugin(MeetingLawyersPlugin.class)` before `super.onCreate` in
   [`MainActivity`](android/app/src/main/java/com/meetinglawyers/sample/ionic/MainActivity.java).
 - Declare `MeetingLawyersMessagingService` in the manifest and add your `google-services.json`.
+- Keep the SDK session and the saved values on the device: set `android:allowBackup="false"` and point
+  `android:dataExtractionRules` to rules that exclude everything, like [`data_extraction_rules.xml`](android/app/src/main/res/xml/data_extraction_rules.xml).
 
 **4. Use it** from TypeScript:
 
