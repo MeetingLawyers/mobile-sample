@@ -85,7 +85,7 @@ MeetingProsIntegration.configure(
     this, lawyersApiKey = "<lawyers key>", doctorsApiKey = "<doctors key>",
     isProduction = false, pushActivity = MainActivity::class.java,
 )
-MeetingProsIntegration.configureTheme(Color.parseColor("#2E7D6B"))
+MeetingProsIntegration.configureTheme("#2E7D6B")
 ```
 
 With `isProduction = false` lawyers use the demo environment and doctors the staging one. `configure` blocks
@@ -110,6 +110,10 @@ and share your Firebase credentials with MeetingLawyers as described in the
 `onMessageReceived` returns `false` for the pushes that are not for the SDKs, so you can handle yours. The video
 call SDK cannot tell its pushes apart, though: it takes every data push that is not a lawyers or doctors chat
 one, so only notification-only pushes reach your code.
+
+**6. Backups.** Keep the SDK sessions on the device: set `android:allowBackup="false"` and point
+`android:dataExtractionRules` to rules that exclude everything, like
+[`data_extraction_rules.xml`](app/src/main/res/xml/data_extraction_rules.xml) (see `AndroidManifest.xml`).
 
 The contract it fulfils is in [`specs/meetingpros/`](../../specs/meetingpros/spec.md).
 

@@ -168,7 +168,7 @@ available.
 | Empty or missing lawyers API key (plugin) | Rejected: `lawyersApiKey is required` |
 | Empty or missing user id (plugin) | Rejected: `userId is required` |
 | Empty or missing professional hash (plugin) | Rejected: `professionalHash is required` |
-| Invalid brand color (plugin) | Rejected: `primaryColor must be #RRGGBB or #RRGGBBAA` |
+| Invalid brand color | Rejected: `primaryColor must be #RRGGBB or #RRGGBBAA` |
 | Unknown list type | Rejected: `type must be lawyers, doctors or vets` |
 | Unknown feature (plugin) | Rejected: `Unknown feature` |
 | Feature not available for the company | Rejected: `<feature> is not available` |
